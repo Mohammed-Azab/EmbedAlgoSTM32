@@ -14,25 +14,28 @@ int main(void){
 	enableClk();
 	configureIO();
 	_Bool pressed = false;
+	//GPIOA->ODR &= ~(0x03); // clear output
 
-	char c = 0;
+	char c = 1;
 
 
 	while (1) {
 
 	  if (GPIOB -> IDR & (1 << 10)){
-		  HAL_Delay(50);
-		  if (GPIOB -> IDR & 1 << 10)
-			  pressed = true;
+		  while (GPIOB -> IDR & (1 << 10));
+		  pressed = true;
 	  }
 
 
-	  if (c<5 && pressed){
+	  if (c<=5 && pressed){
 		  	  pressed = false;
-		  	  light(++c);
+		  	  if (c==1)
+		  		  light(1);
+		  	  c++;
 	  }
 
-	  else if (c++ == 5){
+	  else if (c == 6){
+		  	  c++;
 		  	  light(2);
 	  }
 
@@ -48,6 +51,7 @@ void configureIO(){
 
 	GPIOA -> CRL = 0x44444422; //output 2 MHz A0,A1
 	GPIOB -> CRH = 0x44444844; //input pull-down/up. B10
+	GPIOB->ODR &= ~(1 << 10);
 }
 
 void enableClk(){
@@ -60,7 +64,7 @@ void light (char i){
 
 	switch (i){
 			case 1: GPIOA -> ODR |= 1 << 0;   break; //A0
-			case 2: GPIOA -> ODR |= 1 << 1;   break; //A1
+			case 2: GPIOA -> ODR |= 1 << 1;  break; //A1
 			default: break;
 		}
 
