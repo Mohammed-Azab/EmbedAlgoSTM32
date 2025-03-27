@@ -1,0 +1,5 @@
+../Core/Src/main.c:12:5:main	6
+../Core/Src/main.c:47:6:configureIO	1
+../Core/Src/main.c:53:6:enableClk	1
+../Core/Src/main.c:59:6:light	3
+../Core/Src/main.c:76:6:Error_Handler	1
