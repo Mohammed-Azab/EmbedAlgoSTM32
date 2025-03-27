@@ -10,7 +10,7 @@ void light(char i);
 
 
 int main(void){
-
+	HAL_Init();
 	enableClk();
 	configureIO();
 	_Bool pressed = false;
@@ -22,6 +22,7 @@ int main(void){
 	while (1) {
 
 	  if (GPIOB -> IDR & (1 << 10)){
+		  HAL_Delay(50);
 		  while (GPIOB -> IDR & (1 << 10));
 		  pressed = true;
 	  }
