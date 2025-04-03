@@ -3,21 +3,59 @@
 #include "main.h"
 
 
+
+void enableClk();
+void configureIO();
+void delay(char t);
+
+
+
 int main(void) {
+
+	enableClk();
+	configureIO();
 
   while (1) {
 
+	  if (GPIOB ->IDR & (1<<10)){ //Active High
 
+		  while (-1){
+			  GPIOA -> ODR ^= (1 << 1);
+			  delay(100);
+		  }
 
+	  }
+	  else if (!(GPIOB ->IDR & (1<<11))){ //Active low
 
+		  while (-1){
+		  			  GPIOA -> ODR ^= (1 << 1);
+		  			  delay(500);
+		  		  }
 
-
-
+	  }
 
 
   }
 
 }
+
+void enableClk(){
+
+	RCC -> APB2ENR |= RCC_APB2ENR_IOAEN;
+	RCC -> APB2ENR |= RCC_APB2ENR_IOBEN;
+
+}
+void configureIO(){
+
+	GPIOB -> CRH |= 0x44448844; //B10 & B10 input
+	GPIOA -> CRL |= 0x44444424; //A1 output 2MHz
+	GPIOB -> ODR |= (1<<11); //B11 Pull Up // B10 Pull down by default
+
+}
+void delay(char t){
+
+}
+
 
 
 
