@@ -26,6 +26,9 @@ int main(void){
 			while (-1){
 				GPIOA -> ODR ^= 1 << 1;
 				delay(100);
+				if (!(GPIOB ->IDR & (1<<11))){
+					break;
+				}
 			}
 
 		}
@@ -35,7 +38,9 @@ int main(void){
 			while (-1){
 				GPIOA -> ODR ^= 1 << 1;
 				delay(500);
-			}
+				if (GPIOB -> IDR & (1 << 10)){
+					break;
+				}
 
 		}
 
