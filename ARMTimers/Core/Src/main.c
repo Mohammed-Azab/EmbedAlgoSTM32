@@ -5,7 +5,7 @@
 
 void enableClk();
 void configureIO();
-void delay(char t);
+void delay(int t);
 
 
 
@@ -63,7 +63,7 @@ void configureIO(){
 	GPIOB -> ODR |= (1<<11); //B11 Pull Up // B10 Pull down by default
 
 }
-void delay(char t){
+void delay(int t){
 
 }
 
