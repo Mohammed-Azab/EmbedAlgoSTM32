@@ -54,6 +54,7 @@ void enableClk(){
 
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPAEN;
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPBEN;
+	RCC -> APB2ENR |= RCC_APB2ENR_TIM2EN;
 
 }
 void configureIO(){
