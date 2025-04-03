@@ -1,5 +1,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <math.h>
 
 
 
@@ -54,17 +55,20 @@ void enableClk(){
 
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPAEN;
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPBEN;
-	RCC -> APB2ENR |= RCC_APB1ENR_TIM2EN;
+	RCC -> APB1ENR |= RCC_APB1ENR_TIM2EN;
 
 }
 void configureIO(){
 
 	GPIOB -> CRH |= 0x44448844; //B10 & B10 input
-	GPIOA -> CRL |= 0x44444424; //A1 output 2MHz
+	GPIOA -> CRL |= 0x444444A4; //A1 Alternating Function output 2MHz
 	GPIOB -> ODR |= (1<<11); //B11 Pull Up // B10 Pull down by default
 
 }
 void delay(int t){
+	TIM2 ->PSC = 8000-1;
+	int ARRValP1 = ((t/1000) * 8 * pow(10,6)) / 8000 ;
+	TIM2 ->ARR = ARRValP1-1;
 
 }
 

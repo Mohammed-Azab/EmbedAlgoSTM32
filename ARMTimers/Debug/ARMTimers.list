@@ -188,12 +188,12 @@ void enableClk(){
  80001e0:	4a06      	ldr	r2, [pc, #24]	@ (80001fc <enableClk+0x30>)
  80001e2:	f043 0308 	orr.w	r3, r3, #8
  80001e6:	6193      	str	r3, [r2, #24]
-	RCC -> APB2ENR |= RCC_APB1ENR_TIM2EN;
+	RCC -> APB1ENR |= RCC_APB1ENR_TIM2EN;
  80001e8:	4b04      	ldr	r3, [pc, #16]	@ (80001fc <enableClk+0x30>)
- 80001ea:	699b      	ldr	r3, [r3, #24]
+ 80001ea:	69db      	ldr	r3, [r3, #28]
  80001ec:	4a03      	ldr	r2, [pc, #12]	@ (80001fc <enableClk+0x30>)
  80001ee:	f043 0301 	orr.w	r3, r3, #1
- 80001f2:	6193      	str	r3, [r2, #24]
+ 80001f2:	61d3      	str	r3, [r2, #28]
 
 }
  80001f4:	bf00      	nop
