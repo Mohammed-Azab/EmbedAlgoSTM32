@@ -1,0 +1,4 @@
+../Core/Src/main.c:13:5:main	5
+../Core/Src/main.c:54:6:enableClk	1
+../Core/Src/main.c:60:6:configureIO	1
+../Core/Src/main.c:67:6:delay	1

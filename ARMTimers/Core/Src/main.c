@@ -1,4 +1,3 @@
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
@@ -19,18 +18,30 @@ int main(void) {
 
 	  if (GPIOB ->IDR & (1<<10)){ //Active High
 
-		  while (-1){
-			  GPIOA -> ODR ^= (1 << 1);
-			  delay(100);
+		  delay(60);
+
+		  if (GPIOB ->IDR & (1<<10)){
+
+			  while (-1){
+			  			  GPIOA -> ODR ^= (1 << 1);
+			  			  delay(100);
+			  		  }
+
 		  }
+
 
 	  }
 	  else if (!(GPIOB ->IDR & (1<<11))){ //Active low
 
-		  while (-1){
+		  delay(60);
+
+		  if (!(GPIOB ->IDR & (1<<11))){
+
+			  while (-1){
 		  			  GPIOA -> ODR ^= (1 << 1);
 		  			  delay(500);
 		  		  }
+		  }
 
 	  }
 
@@ -41,8 +52,8 @@ int main(void) {
 
 void enableClk(){
 
-	RCC -> APB2ENR |= RCC_APB2ENR_IOAEN;
-	RCC -> APB2ENR |= RCC_APB2ENR_IOBEN;
+	RCC -> APB2ENR |= RCC_APB2ENR_IOPAEN;
+	RCC -> APB2ENR |= RCC_APB2ENR_IOPBEN;
 
 }
 void configureIO(){
