@@ -1,3 +1,3 @@
 ../Core/Src/main.c:10:5:main	1
-../Core/Src/main.c:28:6:configureIO	1
-../Core/Src/main.c:47:6:enableClk	1
+../Core/Src/main.c:36:6:configureIO	1
+../Core/Src/main.c:51:6:enableClk	1
