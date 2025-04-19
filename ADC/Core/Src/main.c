@@ -6,6 +6,7 @@
 void configureIO();
 void enableClk();
 void initADC();
+void turnOn(uint8_t i);
 
 
 int main(void){
@@ -15,12 +16,17 @@ int main(void){
 
 	initADC();
 
+	uint16_t prev;
+	uint8_t flag = 1;
+
+
 	while (1) {
 
 
 		ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
 		while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
-		uint16_t adcVal = ADC1->DR & 0x3FF;  // Read result (10-bit mask)
+		uint16_t ADCVal = ADC1->DR & 0x3FF;  // Read result (10-bit mask)
+
 
 		/*
 		 *  Why & 0x3FF?
@@ -31,19 +37,26 @@ int main(void){
 		 * */
 
 
+		if (flag){
+			prev = ADCVal;
+			flag = 0;
+		}
+		else if (prev == ADCVal){
+			continue;
+		}
 
-		/*
-		GPIOB -> ODR |= (1 << 13);
-		GPIOB -> ODR |= (1 << 9);
-		GPIOB -> ODR |= (1 << 8);
-		GPIOB -> ODR |= (1 << 6);
-		GPIOB -> ODR |= (1 << 15);
-		GPIOB -> ODR |= (1 << 12);
-		GPIOB -> ODR |= (1 << 0);
-		GPIOB -> ODR |= (1 << 7);
-		GPIOB -> ODR |= (1 << 10);
-		GPIOB -> ODR |= (1 << 11);
-		*/
+		GPIOB -> ODR &= 0; //reset all
+
+		uint8_t num_leds_on = ADCVal / 102;  // 1023 / 10 ≈ 102.3
+
+		for (uint8_t i = 0 ; i< num_leds_on; i++){
+
+			turnOn(i);
+		}
+
+
+
+
 
 
 	}
@@ -98,6 +111,41 @@ void initADC(){
 		ADC1->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
 
 }
+
+void turnOn(uint8_t i){
+
+	// Output signal Sequence B9 B8 B7 B6 B15 B13 B12 B0 B10 B11
+
+	switch (i){
+
+		case 0: GPIOB ->ODR |= (1 << 9); return;
+		case 1: GPIOB ->ODR |= (1 << 8); return;
+		case 2: GPIOB ->ODR |= (1 << 7); return;
+		case 3: GPIOB ->ODR |= (1 << 6); return;
+		case 4: GPIOB ->ODR |= (1 << 15); return;
+		case 5: GPIOB ->ODR |= (1 << 13); return;
+		case 6: GPIOB ->ODR |= (1 << 12); return;
+		case 7: GPIOB ->ODR |= (1 << 0); return;
+		case 8: GPIOB ->ODR |= (1 << 10); return;
+		case 9: GPIOB ->ODR |= (1 << 11); return;
+
+		default: break;
+	}
+}
+
+
+/*
+GPIOB -> ODR |= (1 << 13);
+GPIOB -> ODR |= (1 << 9);
+GPIOB -> ODR |= (1 << 8);
+GPIOB -> ODR |= (1 << 6);
+GPIOB -> ODR |= (1 << 15);
+GPIOB -> ODR |= (1 << 12);
+GPIOB -> ODR |= (1 << 0);
+GPIOB -> ODR |= (1 << 7);
+GPIOB -> ODR |= (1 << 10);
+GPIOB -> ODR |= (1 << 11);
+*/
 
 
 
