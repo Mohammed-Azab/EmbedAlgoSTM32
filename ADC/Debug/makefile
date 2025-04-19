@@ -84,8 +84,8 @@ all: main-build
 main-build: ADC.elf secondary-outputs
 
 # Tool invocations
-ADC.elf ADC.map: $(OBJS) $(USER_OBJS) /home/mohammedazab/STM32CubeIDE/GIU/ADC/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "ADC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/mohammedazab/STM32CubeIDE/GIU/ADC/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ADC.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+ADC.elf ADC.map: $(OBJS) $(USER_OBJS) /home/mohammedazab/STM32CubeIDE/GIU/EmbedAlgoSTM32/ADC/STM32F103C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "ADC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/home/mohammedazab/STM32CubeIDE/GIU/EmbedAlgoSTM32/ADC/STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ADC.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
