@@ -12,6 +12,7 @@ void turnOFF(uint8_t i);
 void setRotationDir(uint8_t i);
 void rotate(uint16_t pwm);
 void pressBreak();
+void freeMotor();
 uint16_t getADCVal();
 
 
@@ -28,7 +29,7 @@ int main(void){
 
 	while (1) {
 
-
+		freeMotor();
 
 
 
@@ -39,7 +40,7 @@ int main(void){
 		}
 
 
-		if (GPIOB -> IDR & (1 << 13)){
+		if (GPIOB -> IDR & (1 << 13)){ // rotate Counter CLockwise
 			delay(50);
 			while (GPIOB -> IDR & (1 << 13)){
 				turnON(0);
@@ -58,7 +59,7 @@ int main(void){
 
 		}
 
-		if (GPIOB -> IDR & (1 << 14)){
+		if (GPIOB -> IDR & (1 << 14)){ // rotate CLockwise
 			delay(50);
 			while (GPIOB -> IDR & (1 << 14)){
 				turnON(1);
@@ -188,8 +189,8 @@ uint16_t getADCVal(){
 
 void setRotationDir(uint8_t i){
 	switch(i){
-		case 0 : GPIOB -> ODR |= (1 << 7) ;break;
-		case 1 : GPIOB -> ODR |= (1 << 8) ;break;
+		case 0 : GPIOB -> ODR |= (1 << 7) ;break; // Counter CLockwise
+		case 1 : GPIOB -> ODR |= (1 << 8) ;break; // CLockwise
 		default: break;
 	}
 }
@@ -203,6 +204,10 @@ void pressBreak(){
 void rotate(uint16_t pwm){
 
 	GPIOB -> ODR |= (1 << 9) ;
+}
+
+void freeMotor(){
+	GPIOB -> ODR &= ~(11 << 7);
 }
 
 
