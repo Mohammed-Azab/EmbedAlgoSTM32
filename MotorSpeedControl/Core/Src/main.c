@@ -9,6 +9,9 @@ void initADC();
 void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
+void setRotationDir(uint8_t i);
+void rotate(uint16_t pwm);
+void pressBreak();
 uint16_t getADCVal();
 
 
@@ -29,26 +32,38 @@ int main(void){
 
 
 
+		if (GPIOB -> IDR & (1 << 13) && GPIOB -> IDR & (1 << 14)){ // break
+			pressBreak();
+			continue;
+
+		}
+
 
 		if (GPIOB -> IDR & (1 << 13)){
 			delay(50);
 			while (GPIOB -> IDR & (1 << 13)){
-				//turnON(0);
-				if (getADCVal() >=50){
-					turnON(0);
-				}
-				else {
-					turnOFF(0);
-				}
+				turnON(0);
+				setRotationDir(0);
+				rotate(1);
+//				if (getADCVal() >=50){
+//					turnON(0);
+//					rotate();
+//				}
+//				else {
+//					turnOFF(0);
+//				}
 
 			}
 			turnOFF(0);
+
 		}
 
 		if (GPIOB -> IDR & (1 << 14)){
 			delay(50);
 			while (GPIOB -> IDR & (1 << 14)){
 				turnON(1);
+				setRotationDir(1);
+				rotate(1);
 			}
 			turnOFF(1);
 		}
@@ -75,11 +90,16 @@ void configureIO(){
 	 * LEDS => B10 A7 output
 	 * Buttons => B13 B14 Input pull down (Active high)
 	 * ADC => A0 input
+	 * HBridge IN3 => B7
+	 * HBridge IN4 => B8
+	 * HBridge ENB => B9
 	 *
 	 * */
 
 	GPIOA -> CRL = 0x24444440;
-	GPIOB -> CRH = 0x48844244;
+	GPIOB -> CRL = 0x24444444;
+	GPIOB -> CRH = 0x48844222;
+
 
 }
 
@@ -164,6 +184,25 @@ uint16_t getADCVal(){
 	 *  It's a way to guarantee you're reading a clean 10-bit result
 	 *
      * */
+}
+
+void setRotationDir(uint8_t i){
+	switch(i){
+		case 0 : GPIOB -> ODR |= (1 << 7) ;break;
+		case 1 : GPIOB -> ODR |= (1 << 8) ;break;
+		default: break;
+	}
+}
+
+
+void pressBreak(){
+	GPIOB -> ODR |= (11 << 7) ;
+
+}
+
+void rotate(uint16_t pwm){
+
+	GPIOB -> ODR |= (1 << 9) ;
 }
 
 
