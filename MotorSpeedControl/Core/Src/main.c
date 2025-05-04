@@ -9,6 +9,7 @@ void initADC();
 void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
+uint16_t getADCVal();
 
 
 int main(void){
@@ -16,7 +17,7 @@ int main(void){
 	configureIO();
 
 
-	//initADC();
+	initADC();
 
 	//uint16_t prev;
 	//uint8_t flag = 1;
@@ -24,10 +25,21 @@ int main(void){
 
 	while (1) {
 
+
+
+
+
+
 		if (GPIOB -> IDR & (1 << 13)){
 			delay(50);
 			while (GPIOB -> IDR & (1 << 13)){
-				turnON(0);
+				//turnON(0);
+				if (getADCVal() >=50){
+					turnON(0);
+				}
+				else {
+					turnOFF(0);
+				}
 
 			}
 			turnOFF(0);
@@ -37,7 +49,6 @@ int main(void){
 			delay(50);
 			while (GPIOB -> IDR & (1 << 14)){
 				turnON(1);
-
 			}
 			turnOFF(1);
 		}
@@ -63,10 +74,11 @@ void configureIO(){
 	 *
 	 * LEDS => B10 A7 output
 	 * Buttons => B13 B14 Input pull down (Active high)
+	 * ADC => A0 input
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x24444444;
+	GPIOA -> CRL = 0x24444440;
 	GPIOB -> CRH = 0x48844244;
 
 }
@@ -75,7 +87,7 @@ void enableClk(){
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPAEN;
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPBEN;
 	RCC -> APB1ENR |= 0b11; //enable TIM2 & TIM3
-	RCC -> APB2ENR |= (1 << 9); // enable clk for ADC1
+	RCC -> APB2ENR |= (1 << 9); // enable CLK for ADC1
 }
 
 
@@ -135,6 +147,23 @@ void delay(uint16_t t){
 	while(!(TIM3->SR & TIM_SR_UIF));
 	TIM3->SR &= ~TIM_SR_UIF;
 	TIM3 ->CR1 &= ~(TIM_CR1_CEN);
+}
+
+uint16_t getADCVal(){
+	ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
+	while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
+	ADC1->SR &= ~(ADC_SR_EOC);
+	uint16_t ADCVal = ADC1->DR & 0x3FF;  // Read result (10-bit mask)
+	return ADCVal;
+
+	/*
+	 *  Why & 0x3FF?
+	 *
+	 *  0x3FF in hexadecimal = 1023 in decimal = 0b0000001111111111 in binary (10 bits set to 1).
+	 *  This mask ensures you only keep the lowest 10 bits and discard any upper garbage bits that might accidentally exist in ADC1->DR.
+	 *  It's a way to guarantee you're reading a clean 10-bit result
+	 *
+     * */
 }
 
 
