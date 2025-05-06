@@ -47,7 +47,7 @@ int main(void){
 		}
 		if (GPIOB->IDR & (1 << 14)){
 			delay(50);
-			if (GPIOB->IDR & (1 << 14))controlMotor(1, 14); // CW
+			if (GPIOB->IDR & (1 << 14)) controlMotor(1, 14); // CW
 		}
 
 
@@ -149,7 +149,7 @@ uint16_t getADCVal(){
 	ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
 	while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
 	ADC1->SR &= ~(ADC_SR_EOC);
-	uint16_t ADCVal = ADC1->DR & 0xFFF;  // Read result (10-bit mask)
+	uint16_t ADCVal = ADC1->DR;  // Read result (10-bit mask)
 	return ADCVal;
 
 	/*
@@ -215,7 +215,6 @@ void writePWM (float dutyCycle){
 }
 
 void controlMotor(uint8_t motorIndex, uint8_t dirBit){
-	delay(50);
 	while (GPIOB -> IDR & (1 << dirBit)){
 		turnON(motorIndex);
 		setRotationDir(motorIndex);
