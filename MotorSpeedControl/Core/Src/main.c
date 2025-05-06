@@ -41,49 +41,8 @@ int main(void){
 		}
 
 
-		if (GPIOB -> IDR & (1 << 13)){ // rotate Counter CLockwise
-			delay(50);
-			while (GPIOB -> IDR & (1 << 13)){
-				turnON(0);
-				setRotationDir(0);
-				uint16_t ADCVal = getADCVal();
-				float dutyCycle = (ADCVal * 100) / 4095;
-				writePWM(dutyCycle);
-
-
-				//rotateMax(1);
-//				if (getADCVal() >=50){
-//					turnON(0);
-//					rotate();
-//				}
-//				else {
-//					turnOFF(0);
-//				}
-
-			}
-			turnOFF(0);
-
-		}
-
-		if (GPIOB -> IDR & (1 << 14)){ // rotate CLockwise
-			delay(50);
-			while (GPIOB -> IDR & (1 << 14)){
-				turnON(1);
-				setRotationDir(1);
-				uint16_t ADCVal = getADCVal();
-				float dutyCycle = (ADCVal * 100) / 4095;
-				writePWM(dutyCycle);
-				//rotateMax(1);
-			}
-			turnOFF(1);
-		}
-
-
-
-
-
-
-
+		if (GPIOB->IDR & (1 << 13)) controlMotor(0, 13); // CCW
+		if (GPIOB->IDR & (1 << 14)) controlMotor(1, 14); // CW
 
 
 
