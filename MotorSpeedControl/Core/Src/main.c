@@ -216,7 +216,7 @@ void controlMotor(uint8_t motorIndex, uint8_t dirBit){
 		turnON(motorIndex);
 		setRotationDir(motorIndex);
 		uint16_t ADCVal = getADCVal();
-		float dutyCycle = (ADCVal * 100.0f) / 4095;
+		float dutyCycle = ((float)ADCVal * 100.0f) / 4095.0f;
 		writePWM(dutyCycle);
 	}
 	turnOFF(motorIndex);
