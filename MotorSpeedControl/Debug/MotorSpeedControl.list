@@ -1178,11 +1178,11 @@ void initPWM(){
  8000a90:	f240 32e7 	movw	r2, #999	@ 0x3e7
  8000a94:	62da      	str	r2, [r3, #44]	@ 0x2c
 
-	TIM2->CCMR1 |= (7 << 12); // mode 2 for ch2
+	TIM2->CCMR1 |= (6 << 12); // mode 2 for ch2
  8000a96:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000a9a:	699b      	ldr	r3, [r3, #24]
  8000a9c:	f04f 4280 	mov.w	r2, #1073741824	@ 0x40000000
- 8000aa0:	f443 43e0 	orr.w	r3, r3, #28672	@ 0x7000
+ 8000aa0:	f443 43c0 	orr.w	r3, r3, #24576	@ 0x6000
  8000aa4:	6193      	str	r3, [r2, #24]
 
 	TIM2 -> CCR2 = 0; //duty Cycle =0

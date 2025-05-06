@@ -189,7 +189,7 @@ void initPWM(){
 	TIM2 -> PSC = 8 - 1;
 	TIM2 -> ARR = 1000 - 1;
 
-	TIM2->CCMR1 |= (7 << 12); // mode 2 for ch2
+	TIM2->CCMR1 |= (6 << 12); // mode 1 for ch2
 
 	TIM2 -> CCR2 = 0; //duty Cycle =0
 
