@@ -6,10 +6,10 @@
 ../Core/Src/main.c:119:6:turnOFF	3
 ../Core/Src/main.c:133:6:delay	2
 ../Core/Src/main.c:142:10:getADCVal	2
-../Core/Src/main.c:159:6:setRotationDir	3
-../Core/Src/main.c:168:6:pressBreak	1
-../Core/Src/main.c:173:6:rotateMax	1
-../Core/Src/main.c:178:6:freeMotor	1
-../Core/Src/main.c:182:6:initPWM	1
-../Core/Src/main.c:204:6:writePWM	2
-../Core/Src/main.c:213:6:controlMotor	2
+../Core/Src/main.c:157:6:setRotationDir	3
+../Core/Src/main.c:166:6:pressBreak	1
+../Core/Src/main.c:171:6:rotateMax	1
+../Core/Src/main.c:176:6:freeMotor	1
+../Core/Src/main.c:180:6:initPWM	1
+../Core/Src/main.c:202:6:writePWM	2
+../Core/Src/main.c:211:6:controlMotor	2

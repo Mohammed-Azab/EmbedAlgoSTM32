@@ -37,15 +37,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000152bb  00000000  00000000  00003963  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000204c  00000000  00000000  00018c1e  2**0
+ 17 .debug_line   0000204a  00000000  00000000  00018c1e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007b3dc  00000000  00000000  0001ac6a  2**0
+ 18 .debug_str    0007b3dc  00000000  00000000  0001ac68  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00096046  2**0
+ 19 .comment      00000043  00000000  00000000  00096044  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000085c  00000000  00000000  0009608c  2**2
+ 20 .debug_frame  0000085c  00000000  00000000  00096088  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000064  00000000  00000000  000968e8  2**0
+ 21 .debug_line_str 00000064  00000000  00000000  000968e4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1035,17 +1035,17 @@ uint16_t getADCVal(){
  80009b8:	4a07      	ldr	r2, [pc, #28]	@ (80009d8 <getADCVal+0x44>)
  80009ba:	f023 0302 	bic.w	r3, r3, #2
  80009be:	6013      	str	r3, [r2, #0]
-	uint16_t ADCVal = ADC1->DR & 0x3FF;  // Read result (10-bit mask)
+	uint16_t ADCVal = ADC1->DR & 0xFFF;  // Read result (10-bit mask)
  80009c0:	4b05      	ldr	r3, [pc, #20]	@ (80009d8 <getADCVal+0x44>)
  80009c2:	6cdb      	ldr	r3, [r3, #76]	@ 0x4c
  80009c4:	b29b      	uxth	r3, r3
- 80009c6:	f3c3 0309 	ubfx	r3, r3, #0, #10
+ 80009c6:	f3c3 030b 	ubfx	r3, r3, #0, #12
  80009ca:	80fb      	strh	r3, [r7, #6]
 	return ADCVal;
  80009cc:	88fb      	ldrh	r3, [r7, #6]
-	 *  0x3FF in hexadecimal = 1023 in decimal = 0b0000001111111111 in binary (10 bits set to 1).
-	 *  This mask ensures you only keep the lowest 10 bits and discard any upper garbage bits that might accidentally exist in ADC1->DR.
-	 *  It's a way to guarantee you're reading a clean 10-bit result
+	 *  Why & 0xFFF?
+	 *
+	 *  It's a way to guarantee reading a clean 12-bit result
 	 *
      * */
 }
@@ -1103,11 +1103,11 @@ void setRotationDir(uint8_t i){
 void pressBreak(){
  8000a1c:	b480      	push	{r7}
  8000a1e:	af00      	add	r7, sp, #0
-	GPIOB -> ODR |= (11 << 7) ;
+	GPIOB->ODR |= (1 << 7) | (1 << 8);
  8000a20:	4b04      	ldr	r3, [pc, #16]	@ (8000a34 <pressBreak+0x18>)
  8000a22:	68db      	ldr	r3, [r3, #12]
  8000a24:	4a03      	ldr	r2, [pc, #12]	@ (8000a34 <pressBreak+0x18>)
- 8000a26:	f443 63b0 	orr.w	r3, r3, #1408	@ 0x580
+ 8000a26:	f443 73c0 	orr.w	r3, r3, #384	@ 0x180
  8000a2a:	60d3      	str	r3, [r2, #12]
 
 }
@@ -1126,11 +1126,11 @@ void rotateMax(uint16_t pwm){
 void freeMotor(){
  8000a38:	b480      	push	{r7}
  8000a3a:	af00      	add	r7, sp, #0
-	GPIOB -> ODR &= ~(11 << 7);
+	GPIOB->ODR &= ~((1 << 7) | (1 << 8));
  8000a3c:	4b04      	ldr	r3, [pc, #16]	@ (8000a50 <freeMotor+0x18>)
  8000a3e:	68db      	ldr	r3, [r3, #12]
  8000a40:	4a03      	ldr	r2, [pc, #12]	@ (8000a50 <freeMotor+0x18>)
- 8000a42:	f423 63b0 	bic.w	r3, r3, #1408	@ 0x580
+ 8000a42:	f423 73c0 	bic.w	r3, r3, #384	@ 0x180
  8000a46:	60d3      	str	r3, [r2, #12]
 }
  8000a48:	bf00      	nop

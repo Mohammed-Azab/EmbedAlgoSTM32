@@ -41,8 +41,14 @@ int main(void){
 		}
 
 
-		if (GPIOB->IDR & (1 << 13)) controlMotor(0, 13); // CCW
-		if (GPIOB->IDR & (1 << 14)) controlMotor(1, 14); // CW
+		if (GPIOB->IDR & (1 << 13)){
+			delay(50);
+			if (GPIOB->IDR & (1 << 13)) controlMotor(0, 13); // CCW
+		}
+		if (GPIOB->IDR & (1 << 14)){
+			delay(50);
+			if (GPIOB->IDR & (1 << 14))controlMotor(1, 14); // CW
+		}
 
 
 
