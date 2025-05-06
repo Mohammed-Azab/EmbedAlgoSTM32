@@ -16,7 +16,7 @@ void freeMotor();
 uint16_t getADCVal();
 void initPWM();
 void writePWM (float dutyCycle);
-void controlMotor(uint8_t motorIndex, uint8_t dirBit)
+void controlMotor(uint8_t motorIndex, uint8_t dirBit);
 
 
 int main(void){
@@ -143,15 +143,13 @@ uint16_t getADCVal(){
 	ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
 	while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
 	ADC1->SR &= ~(ADC_SR_EOC);
-	uint16_t ADCVal = ADC1->DR & 0x3FF;  // Read result (10-bit mask)
+	uint16_t ADCVal = ADC1->DR & 0xFFF;  // Read result (10-bit mask)
 	return ADCVal;
 
 	/*
-	 *  Why & 0x3FF?
+	 *  Why & 0xFFF?
 	 *
-	 *  0x3FF in hexadecimal = 1023 in decimal = 0b0000001111111111 in binary (10 bits set to 1).
-	 *  This mask ensures you only keep the lowest 10 bits and discard any upper garbage bits that might accidentally exist in ADC1->DR.
-	 *  It's a way to guarantee you're reading a clean 10-bit result
+	 *  It's a way to guarantee reading a clean 12-bit result
 	 *
      * */
 }
@@ -166,7 +164,7 @@ void setRotationDir(uint8_t i){
 
 
 void pressBreak(){
-	GPIOB -> ODR |= (11 << 7) ;
+	GPIOB->ODR |= (1 << 7) | (1 << 8);
 
 }
 
@@ -176,7 +174,7 @@ void rotateMax(uint16_t pwm){
 }
 
 void freeMotor(){
-	GPIOB -> ODR &= ~(11 << 7);
+	GPIOB->ODR &= ~((1 << 7) | (1 << 8));
 }
 
 void initPWM(){
