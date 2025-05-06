@@ -16,6 +16,7 @@ void freeMotor();
 uint16_t getADCVal();
 void initPWM();
 void writePWM (float dutyCycle);
+void controlMotor(uint8_t motorIndex, uint8_t dirBit)
 
 
 int main(void){
@@ -249,6 +250,19 @@ void writePWM (float dutyCycle){
 	TIM2 -> CCR2 = (TIM2->ARR + 1) * dutyCycle / 100;
 
 }
+
+void controlMotor(uint8_t motorIndex, uint8_t dirBit){
+	delay(50);
+	while (GPIOB -> IDR & (1 << dirBit)){
+		turnON(motorIndex);
+		setRotationDir(motorIndex);
+		uint16_t ADCVal = getADCVal();
+		float dutyCycle = (ADCVal * 100.0f) / 4095;
+		writePWM(dutyCycle);
+	}
+	turnOFF(motorIndex);
+}
+
 
 /*
  * ⚙️ Steps to Configure PWM in Bare-Metal STM32
