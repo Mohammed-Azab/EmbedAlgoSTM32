@@ -10,10 +10,12 @@ void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
 void setRotationDir(uint8_t i);
-void rotate(uint16_t pwm);
+void rotateMax(uint16_t pwm);
 void pressBreak();
 void freeMotor();
 uint16_t getADCVal();
+void initPWM();
+void writePWM (float dutyCycle);
 
 
 int main(void){
@@ -22,9 +24,7 @@ int main(void){
 
 
 	initADC();
-
-	//uint16_t prev;
-	//uint8_t flag = 1;
+	initPWM();
 
 
 	while (1) {
@@ -45,7 +45,12 @@ int main(void){
 			while (GPIOB -> IDR & (1 << 13)){
 				turnON(0);
 				setRotationDir(0);
-				rotate(1);
+				uint16_t ADCVal = getADCVal();
+				float dutyCycle = (ADCVal * 100) / 4095;
+				writePWM(dutyCycle);
+
+
+				//rotateMax(1);
 //				if (getADCVal() >=50){
 //					turnON(0);
 //					rotate();
@@ -64,7 +69,10 @@ int main(void){
 			while (GPIOB -> IDR & (1 << 14)){
 				turnON(1);
 				setRotationDir(1);
-				rotate(1);
+				uint16_t ADCVal = getADCVal();
+				float dutyCycle = (ADCVal * 100) / 4095;
+				writePWM(dutyCycle);
+				//rotateMax(1);
 			}
 			turnOFF(1);
 		}
@@ -88,16 +96,17 @@ void configureIO(){
 
 	/*
 	 *
-	 * LEDS => B10 A7 output
-	 * Buttons => B13 B14 Input pull down (Active high)
-	 * ADC => A0 input
+	 * LEDS => B10 A7 output "2"
+	 * Buttons => B13 B14 Input pull down (Active high) "8"
+	 * ADC => A0 input "0"
+	 * PWM => A1 output AF "A"
 	 * HBridge IN3 => B7
 	 * HBridge IN4 => B8
 	 * HBridge ENB => B9
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x24444440;
+	GPIOA -> CRL = 0x244444A0;
 	GPIOB -> CRL = 0x24444444;
 	GPIOB -> CRH = 0x48844222;
 
@@ -201,7 +210,7 @@ void pressBreak(){
 
 }
 
-void rotate(uint16_t pwm){
+void rotateMax(uint16_t pwm){
 
 	GPIOB -> ODR |= (1 << 9) ;
 }
@@ -209,6 +218,57 @@ void rotate(uint16_t pwm){
 void freeMotor(){
 	GPIOB -> ODR &= ~(11 << 7);
 }
+
+void initPWM(){
+	RCC ->APB1ENR |= RCC_APB1ENR_TIM2EN; //enable Timer
+
+	TIM2 -> PSC = 8 - 1;
+	TIM2 -> ARR = 1000 - 1;
+
+	TIM2->CCMR1 |= (7 << 12); // mode 2 for ch2
+
+	TIM2 -> CCR2 = 0; //duty Cycle =0
+
+	TIM2->CCMR1 |= TIM_CCMR1_OC1PE; // Enable preload
+
+	TIM2->CCER |= TIM_CCER_CC2E;    // Enable output for CH1
+
+	TIM2->CR1 |= TIM_CR1_ARPE;   // Enable auto-reload Preload
+
+	TIM2->EGR |= TIM_EGR_UG;     // Force update to load registers
+
+	TIM2->CR1 |= TIM_CR1_CEN;    // Enable timer
+
+}
+
+void writePWM (float dutyCycle){
+	if (dutyCycle > 100){
+		dutyCycle = 100;
+	}
+
+	TIM2 -> CCR2 = (TIM2->ARR + 1) * dutyCycle / 100;
+
+}
+
+/*
+ * ⚙️ Steps to Configure PWM in Bare-Metal STM32
+
+`	Assuming Timer2 and a pin like PA0:
+
+    1- Enable GPIOA and TIM2 clocks.
+
+    2- Configure PA0 as alternate function (AF mode).
+
+    3- Set timer PSC and ARR for desired frequency.
+
+    4- Set CCRx for duty cycle (e.g., CCR1 for channel 1).
+
+    5- Set PWM mode in TIMx_CCMR1 (PWM Mode 1 or 2).
+
+    6- Enable output in TIMx_CCER (channel enable).
+
+    7- Start the timer by enabling the counter in TIMx_CR1.
+ */
 
 
 
