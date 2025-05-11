@@ -32,7 +32,7 @@ int main(void){
 
 	while (1) {
 
-		freeMotor();
+		/*freeMotor();
 
 
 
@@ -51,6 +51,21 @@ int main(void){
 			delay(50);
 			if (GPIOB->IDR & (1 << 14)) controlMotor(1, 14); // CW
 		}
+		*/
+
+		if (getADCVal(0) > 2000){
+			turnON(0);
+		}else {
+			turnOFF(0);
+		}
+
+
+
+		if (getADCVal(1) > 2000){
+					turnON(1);
+		}else {
+					turnOFF(1);
+				}
 
 
 
@@ -117,7 +132,7 @@ void initADC1(){
 void initADC2(){
 
 		ADC2->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
-		ADC2->SQR3 = 0; // Channel 0 first in the sequence
+		ADC2->SQR3 = 2; // Channel 2
 		ADC2 -> SMPR2 &= 0; // reseting the sample time
 
 		ADC2->CR2 |= ADC_CR2_ADON; // ADC on
