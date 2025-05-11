@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  00002004  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000106a  00000000  00000000  0000202d  2**0
+ 12 .debug_info   00001136  00000000  00000000  0000202d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000005d6  00000000  00000000  00003097  2**0
+ 13 .debug_abbrev 00000603  00000000  00000000  00003163  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000228  00000000  00000000  00003670  2**3
+ 14 .debug_aranges 00000238  00000000  00000000  00003768  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 0000018b  00000000  00000000  00003898  2**0
+ 15 .debug_rnglists 00000198  00000000  00000000  000039a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000152bb  00000000  00000000  00003a23  2**0
+ 16 .debug_macro  000152bb  00000000  00000000  00003b38  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000020c8  00000000  00000000  00018cde  2**0
+ 17 .debug_line   00002123  00000000  00000000  00018df3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007b3ab  00000000  00000000  0001ada6  2**0
+ 18 .debug_str    0007b3f3  00000000  00000000  0001af16  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00096151  2**0
+ 19 .comment      00000043  00000000  00000000  00096309  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00000714  00000000  00000000  00096194  2**2
+ 20 .debug_frame  00000750  00000000  00000000  0009634c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000074  00000000  00000000  000968a8  2**0
+ 21 .debug_line_str 00000074  00000000  00000000  00096a9c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -79,9 +79,9 @@ Disassembly of section .text:
  8000148:	08000618 	.word	0x08000618
 
 0800014c <main>:
-void initPWM();
-void writePWM (float dutyCycle);
-void controlMotor(uint8_t motorIndex, uint8_t dirBit);
+
+
+
 
 
 int main(void){

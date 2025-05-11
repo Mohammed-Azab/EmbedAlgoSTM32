@@ -3,6 +3,8 @@
 #include "main.h"
 
 
+
+
 void configureIO();
 void enableClk();
 void initADC1();
@@ -18,6 +20,25 @@ uint16_t getADCVal(uint8_t i);
 void initPWM();
 void writePWM (float dutyCycle);
 void controlMotor(uint8_t motorIndex, uint8_t dirBit);
+int getcurrentPosition();
+
+
+uint8_t Kp;
+uint8_t Ki;
+uint8_t Kd;
+int errDerivative = 0 ;
+int errIntegral = 0 ;
+int prevErr = 0 ;
+int err =0;
+void PIDController();
+int ref = 0 ;
+int curr = 0;
+int u;
+
+
+
+
+
 
 
 int main(void){
@@ -271,26 +292,23 @@ void controlMotor(uint8_t motorIndex, uint8_t dirBit){
 	turnOFF(motorIndex);
 }
 
+int getcurrentPosition(){
 
-/*
- * ⚙️ Steps to Configure PWM in Bare-Metal STM32
+}
 
-`	Assuming Timer2 and a pin like PA0:
 
-    1- Enable GPIOA and TIM2 clocks.
+// PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
 
-    2- Configure PA0 as alternate function (AF mode).
+void PIDController(){
+	while (ref != curr){
+		errIntegral += err;
+		errDerivative =errDerivative - prevErr;
+		err = ref - curr;
+		u = Kp * err + Ki * errIntegral + Kd * errDerivative;
+		curr = getcurrentPosition();
+	}
+}
 
-    3- Set timer PSC and ARR for desired frequency.
-
-    4- Set CCRx for duty cycle (e.g., CCR1 for channel 1).
-
-    5- Set PWM mode in TIMx_CCMR1 (PWM Mode 1 or 2).
-
-    6- Enable output in TIMx_CCER (channel enable).
-
-    7- Start the timer by enabling the counter in TIMx_CR1.
- */
 
 
 
