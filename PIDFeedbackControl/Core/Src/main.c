@@ -5,7 +5,8 @@
 
 void configureIO();
 void enableClk();
-void initADC();
+void initADC1();
+void initADC2();
 void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
@@ -13,7 +14,7 @@ void setRotationDir(uint8_t i);
 void rotateMax(uint16_t pwm);
 void pressBreak();
 void freeMotor();
-uint16_t getADCVal();
+uint16_t getADCVal(uint8_t i);
 void initPWM();
 void writePWM (float dutyCycle);
 void controlMotor(uint8_t motorIndex, uint8_t dirBit);
@@ -24,7 +25,8 @@ int main(void){
 	configureIO();
 
 
-	initADC();
+	initADC1();
+	initADC2();
 	initPWM();
 
 
@@ -83,11 +85,11 @@ void enableClk(){
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPAEN;
 	RCC -> APB2ENR |= RCC_APB2ENR_IOPBEN;
 	RCC -> APB1ENR |= 0b11; //enable TIM2 & TIM3
-	RCC -> APB2ENR |= (1 << 9); // enable CLK for ADC1
+	RCC -> APB2ENR |= (1 << 9) | (1 << 10); // enable CLK for ADC1
 }
 
 
-void initADC(){
+void initADC1(){
 
 		ADC1->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
 		ADC1->SQR3 = 0; // Channel 0 first in the sequence
@@ -107,6 +109,30 @@ void initADC(){
 		ADC1->CR2 &= ~ADC_CR2_CONT;  // Clear CONT bit for single conversion mode
 
 		ADC1->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
+
+}
+
+
+void initADC2(){
+
+		ADC2->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
+		ADC2->SQR3 = 0; // Channel 0 first in the sequence
+		ADC2 -> SMPR2 &= 0; // reseting the sample time
+
+		ADC2->CR2 |= ADC_CR2_ADON; // ADC on
+		for (volatile int i = 0; i < 10000; i++);  // Short delay
+
+		ADC2->CR2 |= ADC_CR2_CAL;          // Start calibration
+		while (ADC2->CR2 & ADC_CR2_CAL);   // Wait for calibration to finish
+
+		ADC2->CR2 |= ADC_CR2_EXTTRIG;  // Enable external trigger
+
+		ADC2->CR2 &= ~ADC_CR2_EXTSEL;       // Clear EXTSEL bits
+		ADC2->CR2 |= (0b111 << 17);         // Set EXTSEL = 111 for SWSTART
+
+		ADC2->CR2 &= ~ADC_CR2_CONT;  // Clear CONT bit for single conversion mode
+
+		ADC2->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
 
 }
 
@@ -145,19 +171,23 @@ void delay(uint16_t t){
 	TIM3 ->CR1 &= ~(TIM_CR1_CEN);
 }
 
-uint16_t getADCVal(){
-	ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
-	while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
-	ADC1->SR &= ~(ADC_SR_EOC);
-	uint16_t ADCVal = ADC1->DR;  // Read result (10-bit mask)
-	return ADCVal;
+uint16_t getADCVal(uint8_t i){
+	if (i ==0){
+		ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
+			while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
+			ADC1->SR &= ~(ADC_SR_EOC);
+			uint16_t ADCVal = ADC1->DR;  // Read result (10-bit mask)
+			return ADCVal;
+	}
+	else {
+		ADC2->CR2 |= ADC_CR2_SWSTART; // start conversion
+		while (!(ADC2->SR & ADC_SR_EOC));     // Wait for conversion complete
+		ADC2->SR &= ~(ADC_SR_EOC);
+		uint16_t ADCVal = ADC2->DR;  // Read result (10-bit mask)
+		return ADCVal;
+	}
 
-	/*
-	 *  Why & 0xFFF?
-	 *
-	 *  It's a way to guarantee reading a clean 12-bit result
-	 *
-     * */
+
 }
 
 void setRotationDir(uint8_t i){
@@ -218,7 +248,7 @@ void controlMotor(uint8_t motorIndex, uint8_t dirBit){
 	while (GPIOB -> IDR & (1 << dirBit)){
 		turnON(motorIndex);
 		setRotationDir(motorIndex);
-		uint16_t ADCVal = getADCVal();
+		uint16_t ADCVal = getADCVal(0);
 		float dutyCycle = ((float)ADCVal * 100.0f) / 4095.0f;
 		writePWM(dutyCycle);
 	}
