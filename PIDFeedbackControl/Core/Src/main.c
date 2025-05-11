@@ -284,6 +284,9 @@ void PIDController(){
         if (curr <= LOWER_LIMIT && ref < curr) break;
         if (curr >= UPPER_LIMIT && ref > curr) break;
 
+        turnON(1); // RED for processing
+        turnOFF(0);
+
         err = ref - curr;
         errIntegral += err;
         errDerivative = err - prevErr;
@@ -304,6 +307,8 @@ void PIDController(){
     }
 
     pressBreak(); // stop motor when done
+    turnON(0); // Blue for finishing
+    turnOFF(1);
 }
 
 
