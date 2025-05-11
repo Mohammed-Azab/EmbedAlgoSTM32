@@ -13,7 +13,6 @@ void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
 void setRotationDir(uint8_t i);
-void rotateMax(uint16_t pwm);
 void pressBreak();
 void freeMotor();
 uint16_t getADCVal(uint8_t i);
@@ -36,6 +35,8 @@ int curr = 0;
 int u;
 
 
+#define LOWER_LIMIT 100
+#define UPPER_LIMIT 3900
 
 
 
@@ -50,43 +51,21 @@ int main(void){
 	initADC2();
 	initPWM();
 
-
-	while (1) {
-
-		/*freeMotor();
-
+	 Kp = 1;
+	 Ki = 0;
+	 Kd = 0;
 
 
-		if (GPIOB -> IDR & (1 << 13) && GPIOB -> IDR & (1 << 14)){ // break
-			pressBreak();
-			continue;
+while (1) {
 
-		}
+	 ref = getADCVal(0);
 
 
-		if (GPIOB->IDR & (1 << 13)){
-			delay(50);
-			if (GPIOB->IDR & (1 << 13)) controlMotor(0, 13); // CCW
-		}
-		if (GPIOB->IDR & (1 << 14)){
-			delay(50);
-			if (GPIOB->IDR & (1 << 14)) controlMotor(1, 14); // CW
-		}
-		*/
+	 curr = getcurrentPosition();
 
-		if (getADCVal(0) > 2000){
-			turnON(0);
-		}else {
-			turnOFF(0);
-		}
+	 PIDController();
 
-
-
-		if (getADCVal(1) > 2000){
-					turnON(1);
-		}else {
-					turnOFF(1);
-				}
+	 delay(50);
 
 
 
@@ -241,10 +220,6 @@ void pressBreak(){
 
 }
 
-void rotateMax(uint16_t pwm){
-
-	GPIOB -> ODR |= (1 << 9) ;
-}
 
 void freeMotor(){
 	GPIOB->ODR &= ~((1 << 7) | (1 << 8));
@@ -294,20 +269,43 @@ void controlMotor(uint8_t motorIndex, uint8_t dirBit){
 
 int getcurrentPosition(){
 
+	return getADCVal(1);
+
 }
 
 
 // PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
 
 void PIDController(){
-	while (ref != curr){
-		errIntegral += err;
-		errDerivative =errDerivative - prevErr;
-		err = ref - curr;
-		u = Kp * err + Ki * errIntegral + Kd * errDerivative;
-		curr = getcurrentPosition();
-	}
+    while (ref != curr){
+        curr = getcurrentPosition();
+
+        // Enforce limits
+        if (curr <= LOWER_LIMIT && ref < curr) break;
+        if (curr >= UPPER_LIMIT && ref > curr) break;
+
+        err = ref - curr;
+        errIntegral += err;
+        errDerivative = err - prevErr;
+        prevErr = err;
+
+        u = Kp * err + Ki * errIntegral + Kd * errDerivative;
+
+        float duty = fabs(u);  // make sure it's positive
+        duty = duty > 100.0f?  100.0f : duty;
+
+        if (u > 0) {
+            setRotationDir(1); //  clockwise
+        } else {
+            setRotationDir(0); // 	counter-clockwise
+        }
+
+        writePWM(duty);
+    }
+
+    pressBreak(); // stop motor when done
 }
+
 
 
 
