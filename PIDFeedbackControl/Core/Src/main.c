@@ -67,6 +67,7 @@ void configureIO(){
 	 * LEDS => B10 A7 output "2"
 	 * Buttons => B13 B14 Input pull down (Active high) "8"
 	 * ADC => A0 input "0"
+	 * ADC => A2 input "0"
 	 * PWM => A1 output AF "A"
 	 * HBridge IN3 => B7
 	 * HBridge IN4 => B8
@@ -74,7 +75,7 @@ void configureIO(){
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x244444A0;
+	GPIOA -> CRL = 0x244440A0;
 	GPIOB -> CRL = 0x24444444;
 	GPIOB -> CRH = 0x48844222;
 
