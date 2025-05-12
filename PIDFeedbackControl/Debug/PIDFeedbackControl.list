@@ -5,47 +5,47 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .isr_vector   0000010c  08000000  08000000  00001000  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  1 .text         0000125c  0800010c  0800010c  0000110c  2**2
+  1 .text         00001280  0800010c  0800010c  0000110c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000000  08001368  08001368  00003004  2**0
+  2 .rodata       00000000  0800138c  0800138c  00003004  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  3 .ARM.extab    00000000  08001368  08001368  00003004  2**0
+  3 .ARM.extab    00000000  0800138c  0800138c  00003004  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000000  08001368  08001368  00003004  2**0
+  4 .ARM          00000000  0800138c  0800138c  00003004  2**0
                   CONTENTS, READONLY
-  5 .preinit_array 00000000  08001368  08001368  00003004  2**0
+  5 .preinit_array 00000000  0800138c  0800138c  00003004  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08001368  08001368  00002368  2**2
+  6 .init_array   00000004  0800138c  0800138c  0000238c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  0800136c  0800136c  0000236c  2**2
+  7 .fini_array   00000004  08001390  08001390  00002390  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000004  20000000  08001370  00003000  2**0
+  8 .data         00000004  20000000  08001394  00003000  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00000040  20000004  08001374  00003004  2**2
+  9 .bss          00000040  20000004  08001398  00003004  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  20000044  08001374  00003044  2**0
+ 10 ._user_heap_stack 00000604  20000044  08001398  00003044  2**0
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  00003004  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00001173  00000000  00000000  0000302d  2**0
+ 12 .debug_info   00001186  00000000  00000000  0000302d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00000623  00000000  00000000  000041a0  2**0
+ 13 .debug_abbrev 00000639  00000000  00000000  000041b3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000238  00000000  00000000  000047c8  2**3
+ 14 .debug_aranges 00000238  00000000  00000000  000047f0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 000001a8  00000000  00000000  00004a00  2**0
+ 15 .debug_rnglists 000001b6  00000000  00000000  00004a28  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00015d4f  00000000  00000000  00004ba8  2**0
+ 16 .debug_macro  00015d55  00000000  00000000  00004bde  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00002448  00000000  00000000  0001a8f7  2**0
+ 17 .debug_line   00002463  00000000  00000000  0001a933  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007ed4e  00000000  00000000  0001cd3f  2**0
+ 18 .debug_str    0007ed5d  00000000  00000000  0001cd96  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  0009ba8d  2**0
+ 19 .comment      00000043  00000000  00000000  0009baf3  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000098c  00000000  00000000  0009bad0  2**2
+ 20 .debug_frame  0000098c  00000000  00000000  0009bb38  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000074  00000000  00000000  0009c45c  2**0
+ 21 .debug_line_str 00000074  00000000  00000000  0009c4c4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -64,7 +64,7 @@ Disassembly of section .text:
  8000122:	bd10      	pop	{r4, pc}
  8000124:	20000004 	.word	0x20000004
  8000128:	00000000 	.word	0x00000000
- 800012c:	08001350 	.word	0x08001350
+ 800012c:	08001374 	.word	0x08001374
 
 08000130 <frame_dummy>:
  8000130:	b508      	push	{r3, lr}
@@ -76,7 +76,7 @@ Disassembly of section .text:
  800013e:	bd08      	pop	{r3, pc}
  8000140:	00000000 	.word	0x00000000
  8000144:	20000008 	.word	0x20000008
- 8000148:	08001350 	.word	0x08001350
+ 8000148:	08001374 	.word	0x08001374
 
 0800014c <__aeabi_drsub>:
  800014c:	f081 4100 	eor.w	r1, r1, #2147483648	@ 0x80000000
@@ -1001,13 +1001,13 @@ int main(void){
  8000b64:	4b14      	ldr	r3, [pc, #80]	@ (8000bb8 <main+0x6c>)
  8000b66:	2201      	movs	r2, #1
  8000b68:	701a      	strb	r2, [r3, #0]
-	 Ki = 0;
+	 Ki = 1.4;
  8000b6a:	4b14      	ldr	r3, [pc, #80]	@ (8000bbc <main+0x70>)
- 8000b6c:	2200      	movs	r2, #0
+ 8000b6c:	2201      	movs	r2, #1
  8000b6e:	701a      	strb	r2, [r3, #0]
-	 Kd = 0;
+	 Kd = 1.2;
  8000b70:	4b13      	ldr	r3, [pc, #76]	@ (8000bc0 <main+0x74>)
- 8000b72:	2200      	movs	r2, #0
+ 8000b72:	2201      	movs	r2, #1
  8000b74:	701a      	strb	r2, [r3, #0]
 
 
@@ -1863,532 +1863,555 @@ void PIDController(){
  80010da:	b082      	sub	sp, #8
  80010dc:	af00      	add	r7, sp, #0
     while (ref != curr){
- 80010de:	e07c      	b.n	80011da <PIDController+0x102>
+ 80010de:	e090      	b.n	8001202 <PIDController+0x12a>
+
         curr = getcurrentPosition();
  80010e0:	f7ff ffd2 	bl	8001088 <getcurrentPosition>
  80010e4:	4603      	mov	r3, r0
- 80010e6:	4a48      	ldr	r2, [pc, #288]	@ (8001208 <PIDController+0x130>)
+ 80010e6:	4a51      	ldr	r2, [pc, #324]	@ (800122c <PIDController+0x154>)
  80010e8:	6013      	str	r3, [r2, #0]
 
         // Enforce limits
-        if (curr <= LOWER_LIMIT && ref < curr) break;
- 80010ea:	4b47      	ldr	r3, [pc, #284]	@ (8001208 <PIDController+0x130>)
+        if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
+ 80010ea:	4b50      	ldr	r3, [pc, #320]	@ (800122c <PIDController+0x154>)
  80010ec:	681b      	ldr	r3, [r3, #0]
- 80010ee:	2b02      	cmp	r3, #2
- 80010f0:	dc05      	bgt.n	80010fe <PIDController+0x26>
- 80010f2:	4b46      	ldr	r3, [pc, #280]	@ (800120c <PIDController+0x134>)
+ 80010ee:	2b64      	cmp	r3, #100	@ 0x64
+ 80010f0:	dc06      	bgt.n	8001100 <PIDController+0x28>
+ 80010f2:	4b4f      	ldr	r3, [pc, #316]	@ (8001230 <PIDController+0x158>)
  80010f4:	681a      	ldr	r2, [r3, #0]
- 80010f6:	4b44      	ldr	r3, [pc, #272]	@ (8001208 <PIDController+0x130>)
+ 80010f6:	4b4d      	ldr	r3, [pc, #308]	@ (800122c <PIDController+0x154>)
  80010f8:	681b      	ldr	r3, [r3, #0]
- 80010fa:	429a      	cmp	r2, r3
- 80010fc:	db75      	blt.n	80011ea <PIDController+0x112>
-        if (curr >= UPPER_LIMIT && ref > curr) break;
- 80010fe:	4b42      	ldr	r3, [pc, #264]	@ (8001208 <PIDController+0x130>)
- 8001100:	681b      	ldr	r3, [r3, #0]
- 8001102:	f640 72fe 	movw	r2, #4094	@ 0xffe
- 8001106:	4293      	cmp	r3, r2
- 8001108:	dd05      	ble.n	8001116 <PIDController+0x3e>
- 800110a:	4b40      	ldr	r3, [pc, #256]	@ (800120c <PIDController+0x134>)
- 800110c:	681a      	ldr	r2, [r3, #0]
- 800110e:	4b3e      	ldr	r3, [pc, #248]	@ (8001208 <PIDController+0x130>)
- 8001110:	681b      	ldr	r3, [r3, #0]
- 8001112:	429a      	cmp	r2, r3
- 8001114:	dc6b      	bgt.n	80011ee <PIDController+0x116>
+ 80010fa:	1ad3      	subs	r3, r2, r3
+ 80010fc:	2b00      	cmp	r3, #0
+ 80010fe:	db0c      	blt.n	800111a <PIDController+0x42>
+            (curr >= UPPER_LIMIT && (ref - curr) > 0)) {
+ 8001100:	4b4a      	ldr	r3, [pc, #296]	@ (800122c <PIDController+0x154>)
+ 8001102:	681b      	ldr	r3, [r3, #0]
+        if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
+ 8001104:	f640 62d7 	movw	r2, #3799	@ 0xed7
+ 8001108:	4293      	cmp	r3, r2
+ 800110a:	dd0f      	ble.n	800112c <PIDController+0x54>
+            (curr >= UPPER_LIMIT && (ref - curr) > 0)) {
+ 800110c:	4b48      	ldr	r3, [pc, #288]	@ (8001230 <PIDController+0x158>)
+ 800110e:	681a      	ldr	r2, [r3, #0]
+ 8001110:	4b46      	ldr	r3, [pc, #280]	@ (800122c <PIDController+0x154>)
+ 8001112:	681b      	ldr	r3, [r3, #0]
+ 8001114:	1ad3      	subs	r3, r2, r3
+ 8001116:	2b00      	cmp	r3, #0
+ 8001118:	dd08      	ble.n	800112c <PIDController+0x54>
+            pressBreak(); // Immediate stop
+ 800111a:	f7ff ff21 	bl	8000f60 <pressBreak>
+            turnON(0);     // Blue LED: Finished
+ 800111e:	2000      	movs	r0, #0
+ 8001120:	f7ff fe34 	bl	8000d8c <turnON>
+            turnOFF(1);    // Turn off red LED
+ 8001124:	2001      	movs	r0, #1
+ 8001126:	f7ff fe5f 	bl	8000de8 <turnOFF>
+            return;
+ 800112a:	e07b      	b.n	8001224 <PIDController+0x14c>
+        }
 
         turnON(1); // RED for processing
- 8001116:	2001      	movs	r0, #1
- 8001118:	f7ff fe38 	bl	8000d8c <turnON>
+ 800112c:	2001      	movs	r0, #1
+ 800112e:	f7ff fe2d 	bl	8000d8c <turnON>
         turnOFF(0);
- 800111c:	2000      	movs	r0, #0
- 800111e:	f7ff fe63 	bl	8000de8 <turnOFF>
+ 8001132:	2000      	movs	r0, #0
+ 8001134:	f7ff fe58 	bl	8000de8 <turnOFF>
 
         err = ref - curr;
- 8001122:	4b3a      	ldr	r3, [pc, #232]	@ (800120c <PIDController+0x134>)
- 8001124:	681a      	ldr	r2, [r3, #0]
- 8001126:	4b38      	ldr	r3, [pc, #224]	@ (8001208 <PIDController+0x130>)
- 8001128:	681b      	ldr	r3, [r3, #0]
- 800112a:	1ad3      	subs	r3, r2, r3
- 800112c:	4a38      	ldr	r2, [pc, #224]	@ (8001210 <PIDController+0x138>)
- 800112e:	6013      	str	r3, [r2, #0]
+ 8001138:	4b3d      	ldr	r3, [pc, #244]	@ (8001230 <PIDController+0x158>)
+ 800113a:	681a      	ldr	r2, [r3, #0]
+ 800113c:	4b3b      	ldr	r3, [pc, #236]	@ (800122c <PIDController+0x154>)
+ 800113e:	681b      	ldr	r3, [r3, #0]
+ 8001140:	1ad3      	subs	r3, r2, r3
+ 8001142:	4a3c      	ldr	r2, [pc, #240]	@ (8001234 <PIDController+0x15c>)
+ 8001144:	6013      	str	r3, [r2, #0]
         errIntegral += err;
- 8001130:	4b38      	ldr	r3, [pc, #224]	@ (8001214 <PIDController+0x13c>)
- 8001132:	681a      	ldr	r2, [r3, #0]
- 8001134:	4b36      	ldr	r3, [pc, #216]	@ (8001210 <PIDController+0x138>)
- 8001136:	681b      	ldr	r3, [r3, #0]
- 8001138:	4413      	add	r3, r2
- 800113a:	4a36      	ldr	r2, [pc, #216]	@ (8001214 <PIDController+0x13c>)
- 800113c:	6013      	str	r3, [r2, #0]
-        errDerivative = err - prevErr;
- 800113e:	4b34      	ldr	r3, [pc, #208]	@ (8001210 <PIDController+0x138>)
- 8001140:	681a      	ldr	r2, [r3, #0]
- 8001142:	4b35      	ldr	r3, [pc, #212]	@ (8001218 <PIDController+0x140>)
- 8001144:	681b      	ldr	r3, [r3, #0]
- 8001146:	1ad3      	subs	r3, r2, r3
- 8001148:	4a34      	ldr	r2, [pc, #208]	@ (800121c <PIDController+0x144>)
- 800114a:	6013      	str	r3, [r2, #0]
-        prevErr = err;
- 800114c:	4b30      	ldr	r3, [pc, #192]	@ (8001210 <PIDController+0x138>)
- 800114e:	681b      	ldr	r3, [r3, #0]
- 8001150:	4a31      	ldr	r2, [pc, #196]	@ (8001218 <PIDController+0x140>)
+ 8001146:	4b3c      	ldr	r3, [pc, #240]	@ (8001238 <PIDController+0x160>)
+ 8001148:	681a      	ldr	r2, [r3, #0]
+ 800114a:	4b3a      	ldr	r3, [pc, #232]	@ (8001234 <PIDController+0x15c>)
+ 800114c:	681b      	ldr	r3, [r3, #0]
+ 800114e:	4413      	add	r3, r2
+ 8001150:	4a39      	ldr	r2, [pc, #228]	@ (8001238 <PIDController+0x160>)
  8001152:	6013      	str	r3, [r2, #0]
+        errDerivative = err - prevErr;
+ 8001154:	4b37      	ldr	r3, [pc, #220]	@ (8001234 <PIDController+0x15c>)
+ 8001156:	681a      	ldr	r2, [r3, #0]
+ 8001158:	4b38      	ldr	r3, [pc, #224]	@ (800123c <PIDController+0x164>)
+ 800115a:	681b      	ldr	r3, [r3, #0]
+ 800115c:	1ad3      	subs	r3, r2, r3
+ 800115e:	4a38      	ldr	r2, [pc, #224]	@ (8001240 <PIDController+0x168>)
+ 8001160:	6013      	str	r3, [r2, #0]
+        prevErr = err;
+ 8001162:	4b34      	ldr	r3, [pc, #208]	@ (8001234 <PIDController+0x15c>)
+ 8001164:	681b      	ldr	r3, [r3, #0]
+ 8001166:	4a35      	ldr	r2, [pc, #212]	@ (800123c <PIDController+0x164>)
+ 8001168:	6013      	str	r3, [r2, #0]
+
+        if (abs(err) <= TOLERANCE) break;
+ 800116a:	4b32      	ldr	r3, [pc, #200]	@ (8001234 <PIDController+0x15c>)
+ 800116c:	681b      	ldr	r3, [r3, #0]
+ 800116e:	f113 0f0f 	cmn.w	r3, #15
+ 8001172:	db03      	blt.n	800117c <PIDController+0xa4>
+ 8001174:	4b2f      	ldr	r3, [pc, #188]	@ (8001234 <PIDController+0x15c>)
+ 8001176:	681b      	ldr	r3, [r3, #0]
+ 8001178:	2b0f      	cmp	r3, #15
+ 800117a:	dd4a      	ble.n	8001212 <PIDController+0x13a>
 
         u = Kp * err + Ki * errIntegral + Kd * errDerivative;
- 8001154:	4b32      	ldr	r3, [pc, #200]	@ (8001220 <PIDController+0x148>)
- 8001156:	781b      	ldrb	r3, [r3, #0]
- 8001158:	461a      	mov	r2, r3
- 800115a:	4b2d      	ldr	r3, [pc, #180]	@ (8001210 <PIDController+0x138>)
- 800115c:	681b      	ldr	r3, [r3, #0]
- 800115e:	fb03 f202 	mul.w	r2, r3, r2
- 8001162:	4b30      	ldr	r3, [pc, #192]	@ (8001224 <PIDController+0x14c>)
- 8001164:	781b      	ldrb	r3, [r3, #0]
- 8001166:	4619      	mov	r1, r3
- 8001168:	4b2a      	ldr	r3, [pc, #168]	@ (8001214 <PIDController+0x13c>)
- 800116a:	681b      	ldr	r3, [r3, #0]
- 800116c:	fb01 f303 	mul.w	r3, r1, r3
- 8001170:	441a      	add	r2, r3
- 8001172:	4b2d      	ldr	r3, [pc, #180]	@ (8001228 <PIDController+0x150>)
- 8001174:	781b      	ldrb	r3, [r3, #0]
- 8001176:	4619      	mov	r1, r3
- 8001178:	4b28      	ldr	r3, [pc, #160]	@ (800121c <PIDController+0x144>)
- 800117a:	681b      	ldr	r3, [r3, #0]
- 800117c:	fb01 f303 	mul.w	r3, r1, r3
- 8001180:	4413      	add	r3, r2
- 8001182:	4a2a      	ldr	r2, [pc, #168]	@ (800122c <PIDController+0x154>)
- 8001184:	6013      	str	r3, [r2, #0]
+ 800117c:	4b31      	ldr	r3, [pc, #196]	@ (8001244 <PIDController+0x16c>)
+ 800117e:	781b      	ldrb	r3, [r3, #0]
+ 8001180:	461a      	mov	r2, r3
+ 8001182:	4b2c      	ldr	r3, [pc, #176]	@ (8001234 <PIDController+0x15c>)
+ 8001184:	681b      	ldr	r3, [r3, #0]
+ 8001186:	fb03 f202 	mul.w	r2, r3, r2
+ 800118a:	4b2f      	ldr	r3, [pc, #188]	@ (8001248 <PIDController+0x170>)
+ 800118c:	781b      	ldrb	r3, [r3, #0]
+ 800118e:	4619      	mov	r1, r3
+ 8001190:	4b29      	ldr	r3, [pc, #164]	@ (8001238 <PIDController+0x160>)
+ 8001192:	681b      	ldr	r3, [r3, #0]
+ 8001194:	fb01 f303 	mul.w	r3, r1, r3
+ 8001198:	441a      	add	r2, r3
+ 800119a:	4b2c      	ldr	r3, [pc, #176]	@ (800124c <PIDController+0x174>)
+ 800119c:	781b      	ldrb	r3, [r3, #0]
+ 800119e:	4619      	mov	r1, r3
+ 80011a0:	4b27      	ldr	r3, [pc, #156]	@ (8001240 <PIDController+0x168>)
+ 80011a2:	681b      	ldr	r3, [r3, #0]
+ 80011a4:	fb01 f303 	mul.w	r3, r1, r3
+ 80011a8:	4413      	add	r3, r2
+ 80011aa:	4a29      	ldr	r2, [pc, #164]	@ (8001250 <PIDController+0x178>)
+ 80011ac:	6013      	str	r3, [r2, #0]
 
         float duty = fabs(u);  // make sure it's positive
- 8001186:	4b29      	ldr	r3, [pc, #164]	@ (800122c <PIDController+0x154>)
- 8001188:	681b      	ldr	r3, [r3, #0]
- 800118a:	4618      	mov	r0, r3
- 800118c:	f7ff f930 	bl	80003f0 <__aeabi_i2d>
- 8001190:	4602      	mov	r2, r0
- 8001192:	460b      	mov	r3, r1
- 8001194:	4610      	mov	r0, r2
- 8001196:	4619      	mov	r1, r3
- 8001198:	f7ff f994 	bl	80004c4 <__aeabi_d2f>
- 800119c:	4603      	mov	r3, r0
- 800119e:	f023 4300 	bic.w	r3, r3, #2147483648	@ 0x80000000
- 80011a2:	607b      	str	r3, [r7, #4]
+ 80011ae:	4b28      	ldr	r3, [pc, #160]	@ (8001250 <PIDController+0x178>)
+ 80011b0:	681b      	ldr	r3, [r3, #0]
+ 80011b2:	4618      	mov	r0, r3
+ 80011b4:	f7ff f91c 	bl	80003f0 <__aeabi_i2d>
+ 80011b8:	4602      	mov	r2, r0
+ 80011ba:	460b      	mov	r3, r1
+ 80011bc:	4610      	mov	r0, r2
+ 80011be:	4619      	mov	r1, r3
+ 80011c0:	f7ff f980 	bl	80004c4 <__aeabi_d2f>
+ 80011c4:	4603      	mov	r3, r0
+ 80011c6:	f023 4300 	bic.w	r3, r3, #2147483648	@ 0x80000000
+ 80011ca:	607b      	str	r3, [r7, #4]
         duty = duty > 100.0f?  100.0f : duty;
- 80011a4:	4922      	ldr	r1, [pc, #136]	@ (8001230 <PIDController+0x158>)
- 80011a6:	6878      	ldr	r0, [r7, #4]
- 80011a8:	f7ff fca6 	bl	8000af8 <__aeabi_fcmpgt>
- 80011ac:	4603      	mov	r3, r0
- 80011ae:	2b00      	cmp	r3, #0
- 80011b0:	d001      	beq.n	80011b6 <PIDController+0xde>
- 80011b2:	4b1f      	ldr	r3, [pc, #124]	@ (8001230 <PIDController+0x158>)
- 80011b4:	e000      	b.n	80011b8 <PIDController+0xe0>
- 80011b6:	687b      	ldr	r3, [r7, #4]
- 80011b8:	607b      	str	r3, [r7, #4]
+ 80011cc:	4921      	ldr	r1, [pc, #132]	@ (8001254 <PIDController+0x17c>)
+ 80011ce:	6878      	ldr	r0, [r7, #4]
+ 80011d0:	f7ff fc92 	bl	8000af8 <__aeabi_fcmpgt>
+ 80011d4:	4603      	mov	r3, r0
+ 80011d6:	2b00      	cmp	r3, #0
+ 80011d8:	d001      	beq.n	80011de <PIDController+0x106>
+ 80011da:	4b1e      	ldr	r3, [pc, #120]	@ (8001254 <PIDController+0x17c>)
+ 80011dc:	e000      	b.n	80011e0 <PIDController+0x108>
+ 80011de:	687b      	ldr	r3, [r7, #4]
+ 80011e0:	607b      	str	r3, [r7, #4]
 
         freeMotor();
- 80011ba:	f7ff fedf 	bl	8000f7c <freeMotor>
+ 80011e2:	f7ff fecb 	bl	8000f7c <freeMotor>
 
         if (u > 0) {
- 80011be:	4b1b      	ldr	r3, [pc, #108]	@ (800122c <PIDController+0x154>)
- 80011c0:	681b      	ldr	r3, [r3, #0]
- 80011c2:	2b00      	cmp	r3, #0
- 80011c4:	dd03      	ble.n	80011ce <PIDController+0xf6>
+ 80011e6:	4b1a      	ldr	r3, [pc, #104]	@ (8001250 <PIDController+0x178>)
+ 80011e8:	681b      	ldr	r3, [r3, #0]
+ 80011ea:	2b00      	cmp	r3, #0
+ 80011ec:	dd03      	ble.n	80011f6 <PIDController+0x11e>
             setRotationDir(1); //  clockwise
- 80011c6:	2001      	movs	r0, #1
- 80011c8:	f7ff feaa 	bl	8000f20 <setRotationDir>
- 80011cc:	e002      	b.n	80011d4 <PIDController+0xfc>
+ 80011ee:	2001      	movs	r0, #1
+ 80011f0:	f7ff fe96 	bl	8000f20 <setRotationDir>
+ 80011f4:	e002      	b.n	80011fc <PIDController+0x124>
         } else {
             setRotationDir(0); // 	counter-clockwise
- 80011ce:	2000      	movs	r0, #0
- 80011d0:	f7ff fea6 	bl	8000f20 <setRotationDir>
+ 80011f6:	2000      	movs	r0, #0
+ 80011f8:	f7ff fe92 	bl	8000f20 <setRotationDir>
         }
 
         writePWM(duty);
- 80011d4:	6878      	ldr	r0, [r7, #4]
- 80011d6:	f7ff ff2b 	bl	8001030 <writePWM>
+ 80011fc:	6878      	ldr	r0, [r7, #4]
+ 80011fe:	f7ff ff17 	bl	8001030 <writePWM>
     while (ref != curr){
- 80011da:	4b0c      	ldr	r3, [pc, #48]	@ (800120c <PIDController+0x134>)
- 80011dc:	681a      	ldr	r2, [r3, #0]
- 80011de:	4b0a      	ldr	r3, [pc, #40]	@ (8001208 <PIDController+0x130>)
- 80011e0:	681b      	ldr	r3, [r3, #0]
- 80011e2:	429a      	cmp	r2, r3
- 80011e4:	f47f af7c 	bne.w	80010e0 <PIDController+0x8>
- 80011e8:	e002      	b.n	80011f0 <PIDController+0x118>
-        if (curr <= LOWER_LIMIT && ref < curr) break;
- 80011ea:	bf00      	nop
- 80011ec:	e000      	b.n	80011f0 <PIDController+0x118>
-        if (curr >= UPPER_LIMIT && ref > curr) break;
- 80011ee:	bf00      	nop
+ 8001202:	4b0b      	ldr	r3, [pc, #44]	@ (8001230 <PIDController+0x158>)
+ 8001204:	681a      	ldr	r2, [r3, #0]
+ 8001206:	4b09      	ldr	r3, [pc, #36]	@ (800122c <PIDController+0x154>)
+ 8001208:	681b      	ldr	r3, [r3, #0]
+ 800120a:	429a      	cmp	r2, r3
+ 800120c:	f47f af68 	bne.w	80010e0 <PIDController+0x8>
+ 8001210:	e000      	b.n	8001214 <PIDController+0x13c>
+        if (abs(err) <= TOLERANCE) break;
+ 8001212:	bf00      	nop
     }
 
     pressBreak(); // stop motor when done
- 80011f0:	f7ff feb6 	bl	8000f60 <pressBreak>
+ 8001214:	f7ff fea4 	bl	8000f60 <pressBreak>
     turnON(0); // Blue for finishing
- 80011f4:	2000      	movs	r0, #0
- 80011f6:	f7ff fdc9 	bl	8000d8c <turnON>
+ 8001218:	2000      	movs	r0, #0
+ 800121a:	f7ff fdb7 	bl	8000d8c <turnON>
     turnOFF(1);
- 80011fa:	2001      	movs	r0, #1
- 80011fc:	f7ff fdf4 	bl	8000de8 <turnOFF>
+ 800121e:	2001      	movs	r0, #1
+ 8001220:	f7ff fde2 	bl	8000de8 <turnOFF>
 }
- 8001200:	bf00      	nop
- 8001202:	3708      	adds	r7, #8
- 8001204:	46bd      	mov	sp, r7
- 8001206:	bd80      	pop	{r7, pc}
- 8001208:	20000038 	.word	0x20000038
- 800120c:	20000034 	.word	0x20000034
- 8001210:	20000030 	.word	0x20000030
- 8001214:	20000028 	.word	0x20000028
- 8001218:	2000002c 	.word	0x2000002c
- 800121c:	20000024 	.word	0x20000024
- 8001220:	20000020 	.word	0x20000020
- 8001224:	20000021 	.word	0x20000021
- 8001228:	20000022 	.word	0x20000022
- 800122c:	2000003c 	.word	0x2000003c
- 8001230:	42c80000 	.word	0x42c80000
+ 8001224:	3708      	adds	r7, #8
+ 8001226:	46bd      	mov	sp, r7
+ 8001228:	bd80      	pop	{r7, pc}
+ 800122a:	bf00      	nop
+ 800122c:	20000038 	.word	0x20000038
+ 8001230:	20000034 	.word	0x20000034
+ 8001234:	20000030 	.word	0x20000030
+ 8001238:	20000028 	.word	0x20000028
+ 800123c:	2000002c 	.word	0x2000002c
+ 8001240:	20000024 	.word	0x20000024
+ 8001244:	20000020 	.word	0x20000020
+ 8001248:	20000021 	.word	0x20000021
+ 800124c:	20000022 	.word	0x20000022
+ 8001250:	2000003c 	.word	0x2000003c
+ 8001254:	42c80000 	.word	0x42c80000
 
-08001234 <NMI_Handler>:
+08001258 <NMI_Handler>:
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
   */
 void NMI_Handler(void)
 {
- 8001234:	b480      	push	{r7}
- 8001236:	af00      	add	r7, sp, #0
+ 8001258:	b480      	push	{r7}
+ 800125a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
    while (1)
- 8001238:	bf00      	nop
- 800123a:	e7fd      	b.n	8001238 <NMI_Handler+0x4>
+ 800125c:	bf00      	nop
+ 800125e:	e7fd      	b.n	800125c <NMI_Handler+0x4>
 
-0800123c <HardFault_Handler>:
+08001260 <HardFault_Handler>:
 
 /**
   * @brief This function handles Hard fault interrupt.
   */
 void HardFault_Handler(void)
 {
- 800123c:	b480      	push	{r7}
- 800123e:	af00      	add	r7, sp, #0
+ 8001260:	b480      	push	{r7}
+ 8001262:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN HardFault_IRQn 0 */
 
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
- 8001240:	bf00      	nop
- 8001242:	e7fd      	b.n	8001240 <HardFault_Handler+0x4>
+ 8001264:	bf00      	nop
+ 8001266:	e7fd      	b.n	8001264 <HardFault_Handler+0x4>
 
-08001244 <MemManage_Handler>:
+08001268 <MemManage_Handler>:
 
 /**
   * @brief This function handles Memory management fault.
   */
 void MemManage_Handler(void)
 {
- 8001244:	b480      	push	{r7}
- 8001246:	af00      	add	r7, sp, #0
+ 8001268:	b480      	push	{r7}
+ 800126a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
- 8001248:	bf00      	nop
- 800124a:	e7fd      	b.n	8001248 <MemManage_Handler+0x4>
+ 800126c:	bf00      	nop
+ 800126e:	e7fd      	b.n	800126c <MemManage_Handler+0x4>
 
-0800124c <BusFault_Handler>:
+08001270 <BusFault_Handler>:
 
 /**
   * @brief This function handles Prefetch fault, memory access fault.
   */
 void BusFault_Handler(void)
 {
- 800124c:	b480      	push	{r7}
- 800124e:	af00      	add	r7, sp, #0
+ 8001270:	b480      	push	{r7}
+ 8001272:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN BusFault_IRQn 0 */
 
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
- 8001250:	bf00      	nop
- 8001252:	e7fd      	b.n	8001250 <BusFault_Handler+0x4>
+ 8001274:	bf00      	nop
+ 8001276:	e7fd      	b.n	8001274 <BusFault_Handler+0x4>
 
-08001254 <UsageFault_Handler>:
+08001278 <UsageFault_Handler>:
 
 /**
   * @brief This function handles Undefined instruction or illegal state.
   */
 void UsageFault_Handler(void)
 {
- 8001254:	b480      	push	{r7}
- 8001256:	af00      	add	r7, sp, #0
+ 8001278:	b480      	push	{r7}
+ 800127a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN UsageFault_IRQn 0 */
 
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
- 8001258:	bf00      	nop
- 800125a:	e7fd      	b.n	8001258 <UsageFault_Handler+0x4>
+ 800127c:	bf00      	nop
+ 800127e:	e7fd      	b.n	800127c <UsageFault_Handler+0x4>
 
-0800125c <SVC_Handler>:
+08001280 <SVC_Handler>:
 
 /**
   * @brief This function handles System service call via SWI instruction.
   */
 void SVC_Handler(void)
 {
- 800125c:	b480      	push	{r7}
- 800125e:	af00      	add	r7, sp, #0
+ 8001280:	b480      	push	{r7}
+ 8001282:	af00      	add	r7, sp, #0
 
   /* USER CODE END SVCall_IRQn 0 */
   /* USER CODE BEGIN SVCall_IRQn 1 */
 
   /* USER CODE END SVCall_IRQn 1 */
 }
- 8001260:	bf00      	nop
- 8001262:	46bd      	mov	sp, r7
- 8001264:	bc80      	pop	{r7}
- 8001266:	4770      	bx	lr
+ 8001284:	bf00      	nop
+ 8001286:	46bd      	mov	sp, r7
+ 8001288:	bc80      	pop	{r7}
+ 800128a:	4770      	bx	lr
 
-08001268 <DebugMon_Handler>:
+0800128c <DebugMon_Handler>:
 
 /**
   * @brief This function handles Debug monitor.
   */
 void DebugMon_Handler(void)
 {
- 8001268:	b480      	push	{r7}
- 800126a:	af00      	add	r7, sp, #0
+ 800128c:	b480      	push	{r7}
+ 800128e:	af00      	add	r7, sp, #0
 
   /* USER CODE END DebugMonitor_IRQn 0 */
   /* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
   /* USER CODE END DebugMonitor_IRQn 1 */
 }
- 800126c:	bf00      	nop
- 800126e:	46bd      	mov	sp, r7
- 8001270:	bc80      	pop	{r7}
- 8001272:	4770      	bx	lr
+ 8001290:	bf00      	nop
+ 8001292:	46bd      	mov	sp, r7
+ 8001294:	bc80      	pop	{r7}
+ 8001296:	4770      	bx	lr
 
-08001274 <PendSV_Handler>:
+08001298 <PendSV_Handler>:
 
 /**
   * @brief This function handles Pendable request for system service.
   */
 void PendSV_Handler(void)
 {
- 8001274:	b480      	push	{r7}
- 8001276:	af00      	add	r7, sp, #0
+ 8001298:	b480      	push	{r7}
+ 800129a:	af00      	add	r7, sp, #0
 
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
 
   /* USER CODE END PendSV_IRQn 1 */
 }
- 8001278:	bf00      	nop
- 800127a:	46bd      	mov	sp, r7
- 800127c:	bc80      	pop	{r7}
- 800127e:	4770      	bx	lr
+ 800129c:	bf00      	nop
+ 800129e:	46bd      	mov	sp, r7
+ 80012a0:	bc80      	pop	{r7}
+ 80012a2:	4770      	bx	lr
 
-08001280 <SysTick_Handler>:
+080012a4 <SysTick_Handler>:
 
 /**
   * @brief This function handles System tick timer.
   */
 void SysTick_Handler(void)
 {
- 8001280:	b580      	push	{r7, lr}
- 8001282:	af00      	add	r7, sp, #0
+ 80012a4:	b580      	push	{r7, lr}
+ 80012a6:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
- 8001284:	f000 f82e 	bl	80012e4 <HAL_IncTick>
+ 80012a8:	f000 f82e 	bl	8001308 <HAL_IncTick>
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
 }
- 8001288:	bf00      	nop
- 800128a:	bd80      	pop	{r7, pc}
+ 80012ac:	bf00      	nop
+ 80012ae:	bd80      	pop	{r7, pc}
 
-0800128c <SystemInit>:
+080012b0 <SystemInit>:
   * @note   This function should be used only after reset.
   * @param  None
   * @retval None
   */
 void SystemInit (void)
 {
- 800128c:	b480      	push	{r7}
- 800128e:	af00      	add	r7, sp, #0
+ 80012b0:	b480      	push	{r7}
+ 80012b2:	af00      	add	r7, sp, #0
 
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM. */
 #endif /* USER_VECT_TAB_ADDRESS */
 }
- 8001290:	bf00      	nop
- 8001292:	46bd      	mov	sp, r7
- 8001294:	bc80      	pop	{r7}
- 8001296:	4770      	bx	lr
+ 80012b4:	bf00      	nop
+ 80012b6:	46bd      	mov	sp, r7
+ 80012b8:	bc80      	pop	{r7}
+ 80012ba:	4770      	bx	lr
 
-08001298 <Reset_Handler>:
+080012bc <Reset_Handler>:
   .weak Reset_Handler
   .type Reset_Handler, %function
 Reset_Handler:
 
 /* Call the clock system initialization function.*/
     bl  SystemInit
- 8001298:	f7ff fff8 	bl	800128c <SystemInit>
+ 80012bc:	f7ff fff8 	bl	80012b0 <SystemInit>
 
 /* Copy the data segment initializers from flash to SRAM */
   ldr r0, =_sdata
- 800129c:	480b      	ldr	r0, [pc, #44]	@ (80012cc <LoopFillZerobss+0xe>)
+ 80012c0:	480b      	ldr	r0, [pc, #44]	@ (80012f0 <LoopFillZerobss+0xe>)
   ldr r1, =_edata
- 800129e:	490c      	ldr	r1, [pc, #48]	@ (80012d0 <LoopFillZerobss+0x12>)
+ 80012c2:	490c      	ldr	r1, [pc, #48]	@ (80012f4 <LoopFillZerobss+0x12>)
   ldr r2, =_sidata
- 80012a0:	4a0c      	ldr	r2, [pc, #48]	@ (80012d4 <LoopFillZerobss+0x16>)
+ 80012c4:	4a0c      	ldr	r2, [pc, #48]	@ (80012f8 <LoopFillZerobss+0x16>)
   movs r3, #0
- 80012a2:	2300      	movs	r3, #0
+ 80012c6:	2300      	movs	r3, #0
   b LoopCopyDataInit
- 80012a4:	e002      	b.n	80012ac <LoopCopyDataInit>
+ 80012c8:	e002      	b.n	80012d0 <LoopCopyDataInit>
 
-080012a6 <CopyDataInit>:
+080012ca <CopyDataInit>:
 
 CopyDataInit:
   ldr r4, [r2, r3]
- 80012a6:	58d4      	ldr	r4, [r2, r3]
+ 80012ca:	58d4      	ldr	r4, [r2, r3]
   str r4, [r0, r3]
- 80012a8:	50c4      	str	r4, [r0, r3]
+ 80012cc:	50c4      	str	r4, [r0, r3]
   adds r3, r3, #4
- 80012aa:	3304      	adds	r3, #4
+ 80012ce:	3304      	adds	r3, #4
 
-080012ac <LoopCopyDataInit>:
+080012d0 <LoopCopyDataInit>:
 
 LoopCopyDataInit:
   adds r4, r0, r3
- 80012ac:	18c4      	adds	r4, r0, r3
+ 80012d0:	18c4      	adds	r4, r0, r3
   cmp r4, r1
- 80012ae:	428c      	cmp	r4, r1
+ 80012d2:	428c      	cmp	r4, r1
   bcc CopyDataInit
- 80012b0:	d3f9      	bcc.n	80012a6 <CopyDataInit>
+ 80012d4:	d3f9      	bcc.n	80012ca <CopyDataInit>
   
 /* Zero fill the bss segment. */
   ldr r2, =_sbss
- 80012b2:	4a09      	ldr	r2, [pc, #36]	@ (80012d8 <LoopFillZerobss+0x1a>)
+ 80012d6:	4a09      	ldr	r2, [pc, #36]	@ (80012fc <LoopFillZerobss+0x1a>)
   ldr r4, =_ebss
- 80012b4:	4c09      	ldr	r4, [pc, #36]	@ (80012dc <LoopFillZerobss+0x1e>)
+ 80012d8:	4c09      	ldr	r4, [pc, #36]	@ (8001300 <LoopFillZerobss+0x1e>)
   movs r3, #0
- 80012b6:	2300      	movs	r3, #0
+ 80012da:	2300      	movs	r3, #0
   b LoopFillZerobss
- 80012b8:	e001      	b.n	80012be <LoopFillZerobss>
+ 80012dc:	e001      	b.n	80012e2 <LoopFillZerobss>
 
-080012ba <FillZerobss>:
+080012de <FillZerobss>:
 
 FillZerobss:
   str  r3, [r2]
- 80012ba:	6013      	str	r3, [r2, #0]
+ 80012de:	6013      	str	r3, [r2, #0]
   adds r2, r2, #4
- 80012bc:	3204      	adds	r2, #4
+ 80012e0:	3204      	adds	r2, #4
 
-080012be <LoopFillZerobss>:
+080012e2 <LoopFillZerobss>:
 
 LoopFillZerobss:
   cmp r2, r4
- 80012be:	42a2      	cmp	r2, r4
+ 80012e2:	42a2      	cmp	r2, r4
   bcc FillZerobss
- 80012c0:	d3fb      	bcc.n	80012ba <FillZerobss>
+ 80012e4:	d3fb      	bcc.n	80012de <FillZerobss>
 
 /* Call static constructors */
     bl __libc_init_array
- 80012c2:	f000 f821 	bl	8001308 <__libc_init_array>
+ 80012e6:	f000 f821 	bl	800132c <__libc_init_array>
 /* Call the application's entry point.*/
   bl main
- 80012c6:	f7ff fc41 	bl	8000b4c <main>
+ 80012ea:	f7ff fc2f 	bl	8000b4c <main>
   bx lr
- 80012ca:	4770      	bx	lr
+ 80012ee:	4770      	bx	lr
   ldr r0, =_sdata
- 80012cc:	20000000 	.word	0x20000000
+ 80012f0:	20000000 	.word	0x20000000
   ldr r1, =_edata
- 80012d0:	20000004 	.word	0x20000004
+ 80012f4:	20000004 	.word	0x20000004
   ldr r2, =_sidata
- 80012d4:	08001370 	.word	0x08001370
+ 80012f8:	08001394 	.word	0x08001394
   ldr r2, =_sbss
- 80012d8:	20000004 	.word	0x20000004
+ 80012fc:	20000004 	.word	0x20000004
   ldr r4, =_ebss
- 80012dc:	20000044 	.word	0x20000044
+ 8001300:	20000044 	.word	0x20000044
 
-080012e0 <ADC1_2_IRQHandler>:
+08001304 <ADC1_2_IRQHandler>:
  * @retval : None
 */
     .section .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
   b Infinite_Loop
- 80012e0:	e7fe      	b.n	80012e0 <ADC1_2_IRQHandler>
+ 8001304:	e7fe      	b.n	8001304 <ADC1_2_IRQHandler>
 	...
 
-080012e4 <HAL_IncTick>:
+08001308 <HAL_IncTick>:
   * @note This function is declared as __weak to be overwritten in case of other
   *      implementations in user file.
   * @retval None
   */
 __weak void HAL_IncTick(void)
 {
- 80012e4:	b480      	push	{r7}
- 80012e6:	af00      	add	r7, sp, #0
+ 8001308:	b480      	push	{r7}
+ 800130a:	af00      	add	r7, sp, #0
   uwTick += uwTickFreq;
- 80012e8:	4b05      	ldr	r3, [pc, #20]	@ (8001300 <HAL_IncTick+0x1c>)
- 80012ea:	781b      	ldrb	r3, [r3, #0]
- 80012ec:	461a      	mov	r2, r3
- 80012ee:	4b05      	ldr	r3, [pc, #20]	@ (8001304 <HAL_IncTick+0x20>)
- 80012f0:	681b      	ldr	r3, [r3, #0]
- 80012f2:	4413      	add	r3, r2
- 80012f4:	4a03      	ldr	r2, [pc, #12]	@ (8001304 <HAL_IncTick+0x20>)
- 80012f6:	6013      	str	r3, [r2, #0]
+ 800130c:	4b05      	ldr	r3, [pc, #20]	@ (8001324 <HAL_IncTick+0x1c>)
+ 800130e:	781b      	ldrb	r3, [r3, #0]
+ 8001310:	461a      	mov	r2, r3
+ 8001312:	4b05      	ldr	r3, [pc, #20]	@ (8001328 <HAL_IncTick+0x20>)
+ 8001314:	681b      	ldr	r3, [r3, #0]
+ 8001316:	4413      	add	r3, r2
+ 8001318:	4a03      	ldr	r2, [pc, #12]	@ (8001328 <HAL_IncTick+0x20>)
+ 800131a:	6013      	str	r3, [r2, #0]
 }
- 80012f8:	bf00      	nop
- 80012fa:	46bd      	mov	sp, r7
- 80012fc:	bc80      	pop	{r7}
- 80012fe:	4770      	bx	lr
- 8001300:	20000001 	.word	0x20000001
- 8001304:	20000040 	.word	0x20000040
+ 800131c:	bf00      	nop
+ 800131e:	46bd      	mov	sp, r7
+ 8001320:	bc80      	pop	{r7}
+ 8001322:	4770      	bx	lr
+ 8001324:	20000001 	.word	0x20000001
+ 8001328:	20000040 	.word	0x20000040
 
-08001308 <__libc_init_array>:
- 8001308:	b570      	push	{r4, r5, r6, lr}
- 800130a:	2600      	movs	r6, #0
- 800130c:	4d0c      	ldr	r5, [pc, #48]	@ (8001340 <__libc_init_array+0x38>)
- 800130e:	4c0d      	ldr	r4, [pc, #52]	@ (8001344 <__libc_init_array+0x3c>)
- 8001310:	1b64      	subs	r4, r4, r5
- 8001312:	10a4      	asrs	r4, r4, #2
- 8001314:	42a6      	cmp	r6, r4
- 8001316:	d109      	bne.n	800132c <__libc_init_array+0x24>
- 8001318:	f000 f81a 	bl	8001350 <_init>
- 800131c:	2600      	movs	r6, #0
- 800131e:	4d0a      	ldr	r5, [pc, #40]	@ (8001348 <__libc_init_array+0x40>)
- 8001320:	4c0a      	ldr	r4, [pc, #40]	@ (800134c <__libc_init_array+0x44>)
- 8001322:	1b64      	subs	r4, r4, r5
- 8001324:	10a4      	asrs	r4, r4, #2
- 8001326:	42a6      	cmp	r6, r4
- 8001328:	d105      	bne.n	8001336 <__libc_init_array+0x2e>
- 800132a:	bd70      	pop	{r4, r5, r6, pc}
- 800132c:	f855 3b04 	ldr.w	r3, [r5], #4
- 8001330:	4798      	blx	r3
- 8001332:	3601      	adds	r6, #1
- 8001334:	e7ee      	b.n	8001314 <__libc_init_array+0xc>
- 8001336:	f855 3b04 	ldr.w	r3, [r5], #4
- 800133a:	4798      	blx	r3
- 800133c:	3601      	adds	r6, #1
- 800133e:	e7f2      	b.n	8001326 <__libc_init_array+0x1e>
- 8001340:	08001368 	.word	0x08001368
- 8001344:	08001368 	.word	0x08001368
- 8001348:	08001368 	.word	0x08001368
- 800134c:	0800136c 	.word	0x0800136c
+0800132c <__libc_init_array>:
+ 800132c:	b570      	push	{r4, r5, r6, lr}
+ 800132e:	2600      	movs	r6, #0
+ 8001330:	4d0c      	ldr	r5, [pc, #48]	@ (8001364 <__libc_init_array+0x38>)
+ 8001332:	4c0d      	ldr	r4, [pc, #52]	@ (8001368 <__libc_init_array+0x3c>)
+ 8001334:	1b64      	subs	r4, r4, r5
+ 8001336:	10a4      	asrs	r4, r4, #2
+ 8001338:	42a6      	cmp	r6, r4
+ 800133a:	d109      	bne.n	8001350 <__libc_init_array+0x24>
+ 800133c:	f000 f81a 	bl	8001374 <_init>
+ 8001340:	2600      	movs	r6, #0
+ 8001342:	4d0a      	ldr	r5, [pc, #40]	@ (800136c <__libc_init_array+0x40>)
+ 8001344:	4c0a      	ldr	r4, [pc, #40]	@ (8001370 <__libc_init_array+0x44>)
+ 8001346:	1b64      	subs	r4, r4, r5
+ 8001348:	10a4      	asrs	r4, r4, #2
+ 800134a:	42a6      	cmp	r6, r4
+ 800134c:	d105      	bne.n	800135a <__libc_init_array+0x2e>
+ 800134e:	bd70      	pop	{r4, r5, r6, pc}
+ 8001350:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8001354:	4798      	blx	r3
+ 8001356:	3601      	adds	r6, #1
+ 8001358:	e7ee      	b.n	8001338 <__libc_init_array+0xc>
+ 800135a:	f855 3b04 	ldr.w	r3, [r5], #4
+ 800135e:	4798      	blx	r3
+ 8001360:	3601      	adds	r6, #1
+ 8001362:	e7f2      	b.n	800134a <__libc_init_array+0x1e>
+ 8001364:	0800138c 	.word	0x0800138c
+ 8001368:	0800138c 	.word	0x0800138c
+ 800136c:	0800138c 	.word	0x0800138c
+ 8001370:	08001390 	.word	0x08001390
 
-08001350 <_init>:
- 8001350:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 8001352:	bf00      	nop
- 8001354:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 8001356:	bc08      	pop	{r3}
- 8001358:	469e      	mov	lr, r3
- 800135a:	4770      	bx	lr
+08001374 <_init>:
+ 8001374:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8001376:	bf00      	nop
+ 8001378:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 800137a:	bc08      	pop	{r3}
+ 800137c:	469e      	mov	lr, r3
+ 800137e:	4770      	bx	lr
 
-0800135c <_fini>:
- 800135c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 800135e:	bf00      	nop
- 8001360:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 8001362:	bc08      	pop	{r3}
- 8001364:	469e      	mov	lr, r3
- 8001366:	4770      	bx	lr
+08001380 <_fini>:
+ 8001380:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8001382:	bf00      	nop
+ 8001384:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8001386:	bc08      	pop	{r3}
+ 8001388:	469e      	mov	lr, r3
+ 800138a:	4770      	bx	lr

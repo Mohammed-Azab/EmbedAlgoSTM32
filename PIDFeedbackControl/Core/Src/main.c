@@ -23,6 +23,8 @@ int getcurrentPosition();
 void CAL();
 
 uint8_t FT = 1 ;
+#define TOLERANCE 15
+
 
 
 uint8_t Kp;
@@ -38,8 +40,8 @@ int curr = 0;
 int u;
 
 
-#define LOWER_LIMIT 2
-#define UPPER_LIMIT 4095
+#define LOWER_LIMIT 100
+#define UPPER_LIMIT 3800
 
 
 
@@ -56,8 +58,8 @@ int main(void){
 	initPWM();
 
 	 Kp = 1;
-	 Ki = 0;
-	 Kd = 0;
+	 Ki = 1.4;
+	 Kd = 1.2;
 
 
 while (1) {
@@ -305,11 +307,17 @@ void CAL(){
 
 void PIDController(){
     while (ref != curr){
+
         curr = getcurrentPosition();
 
         // Enforce limits
-        if (curr <= LOWER_LIMIT && ref < curr) break;
-        if (curr >= UPPER_LIMIT && ref > curr) break;
+        if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
+            (curr >= UPPER_LIMIT && (ref - curr) > 0)) {
+            pressBreak(); // Immediate stop
+            turnON(0);     // Blue LED: Finished
+            turnOFF(1);    // Turn off red LED
+            return;
+        }
 
         turnON(1); // RED for processing
         turnOFF(0);
@@ -318,6 +326,8 @@ void PIDController(){
         errIntegral += err;
         errDerivative = err - prevErr;
         prevErr = err;
+
+        if (abs(err) <= TOLERANCE) break;
 
         u = Kp * err + Ki * errIntegral + Kd * errDerivative;
 
