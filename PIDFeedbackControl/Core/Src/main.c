@@ -38,8 +38,9 @@ int curr = 0;
 int u;
 
 
-#define LOWER_LIMIT 0
+#define LOWER_LIMIT 2
 #define UPPER_LIMIT 4095
+
 
 
 
@@ -61,6 +62,16 @@ int main(void){
 
 while (1) {
 
+
+	switch (FT){
+
+		 	 case 0 : break;
+
+		 	 case 1 : FT =0 ; CAL(); break;
+
+		 	 default : break;
+		 }
+
 	 ref = getADCVal(0);
 
 
@@ -70,12 +81,7 @@ while (1) {
 
 	 delay(50);
 
-	 switch (FT){
 
-	 	 case 0 : break;
-	 	 case 1 : FT =0 ; CAL(); break;
-	 	 default : break;
-	 }
 
 
 }
@@ -87,19 +93,20 @@ void configureIO(){
 
 	/*
 	 *
-	 * LEDS => B10 A7 output "2"
+	 * LEDS => B10 A7 B13 output "2"
 	 * ADC => A0 input "0"
 	 * ADC => A2 input "0"
 	 * PWM => A1 output AF "A"
 	 * HBridge IN3 => B7
 	 * HBridge IN4 => B8
 	 * HBridge ENB => B9
+	 * CAL Button => B14
 	 *
 	 * */
 
 	GPIOA -> CRL = 0x244440A0;
 	GPIOB -> CRL = 0x24444444;
-	GPIOB -> CRH = 0x44244222;
+	GPIOB -> CRH = 0x48244222;
 
 
 }
@@ -283,13 +290,14 @@ int getcurrentPosition(){
 }
 
 void CAL(){
-	if (getADCVal(1) == getADCVal(0)){
-		turnON(2);
+	while (!(GPIOB -> IDR & 1 << 14) ){ // exit CAL
+		if (getADCVal(1) != getADCVal(0)){
+			turnOFF(2);
+		}
+		else {
+			turnON(2);
+		}
 	}
-	else {
-		turnOFF(2);
-	}
-
 }
 
 
