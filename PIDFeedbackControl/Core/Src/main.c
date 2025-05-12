@@ -20,6 +20,9 @@ void initPWM();
 void writePWM (float dutyCycle);
 void controlMotor(uint8_t motorIndex, uint8_t dirBit);
 int getcurrentPosition();
+void CAL();
+
+uint8_t FT = 1 ;
 
 
 uint8_t Kp;
@@ -35,8 +38,8 @@ int curr = 0;
 int u;
 
 
-#define LOWER_LIMIT 100
-#define UPPER_LIMIT 3900
+#define LOWER_LIMIT 0
+#define UPPER_LIMIT 4095
 
 
 
@@ -67,10 +70,15 @@ while (1) {
 
 	 delay(50);
 
+	 switch (FT){
+
+	 	 case 0 : break;
+	 	 case 1 : FT =0 ; CAL(); break;
+	 	 default : break;
+	 }
 
 
-	}
-
+}
 }
 
 
@@ -80,7 +88,6 @@ void configureIO(){
 	/*
 	 *
 	 * LEDS => B10 A7 output "2"
-	 * Buttons => B13 B14 Input pull down (Active high) "8"
 	 * ADC => A0 input "0"
 	 * ADC => A2 input "0"
 	 * PWM => A1 output AF "A"
@@ -92,7 +99,7 @@ void configureIO(){
 
 	GPIOA -> CRL = 0x244440A0;
 	GPIOB -> CRL = 0x24444444;
-	GPIOB -> CRH = 0x48844222;
+	GPIOB -> CRH = 0x44244222;
 
 
 }
@@ -157,8 +164,9 @@ void turnON(uint8_t i){
 
 	switch (i){
 
-		case 0: GPIOA ->ODR |= (1 << 7); return;
-		case 1: GPIOB ->ODR |= (1 << 10); return;
+		case 0: GPIOA ->ODR |= (1 << 7);  return; // Blue indicates reached goal
+		case 1: GPIOB ->ODR |= (1 << 10); return; // Red indicates still processing
+		case 2: GPIOB ->ODR |= (1 << 13); return; // Green indicates CAL for first time
 
 		default: break;
 	}
@@ -169,8 +177,9 @@ void turnOFF(uint8_t i){
 
 	switch (i){
 
-		case 0: GPIOA ->ODR &= ~(1 << 7); return;
+		case 0: GPIOA ->ODR &= ~(1 << 7);  return;
 		case 1: GPIOB ->ODR &= ~(1 << 10); return;
+		case 2: GPIOB ->ODR &= ~(1 << 13); return;
 
 		default: break;
 	}
@@ -273,6 +282,16 @@ int getcurrentPosition(){
 
 }
 
+void CAL(){
+	if (getADCVal(1) == getADCVal(0)){
+		turnON(2);
+	}
+	else {
+		turnOFF(2);
+	}
+
+}
+
 
 // PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
 
@@ -296,6 +315,8 @@ void PIDController(){
 
         float duty = fabs(u);  // make sure it's positive
         duty = duty > 100.0f?  100.0f : duty;
+
+        freeMotor();
 
         if (u > 0) {
             setRotationDir(1); //  clockwise
