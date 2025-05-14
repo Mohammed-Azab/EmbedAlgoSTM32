@@ -23,7 +23,7 @@ int getcurrentPosition();
 void CAL();
 
 uint8_t FT = 1 ;
-#define TOLERANCE 15
+#define TOLERANCE 35
 
 
 
@@ -40,8 +40,8 @@ int curr = 0;
 int u;
 
 
-#define LOWER_LIMIT 100
-#define UPPER_LIMIT 3800
+#define LOWER_LIMIT 1050
+#define UPPER_LIMIT 3400
 
 
 
@@ -65,6 +65,7 @@ int main(void){
 while (1) {
 
 
+
 	switch (FT){
 
 		 	 case 0 : break;
@@ -84,7 +85,13 @@ while (1) {
 	 delay(50);
 
 
+	 /*
+	int val1 = getADCVal(0); // 0 : 4095
+	int val2 = getADCVal(1); // ~490 : 3500
+	// 3400 from Motor Side to 1050 to the Potentiometer Side gives angle from 0 to 180
 
+	turnON(0);
+	  */
 
 }
 }
