@@ -306,6 +306,7 @@ int getcurrentPosition(){
 
 void CAL(){
 	while (!(GPIOB -> IDR & 1 << 14) ){ // exit CAL
+		delay(50);
 		if (getADCVal(1) != getADCVal(0)){
 			turnOFF(2);
 		}
