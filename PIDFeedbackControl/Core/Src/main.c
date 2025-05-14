@@ -325,10 +325,13 @@ void PIDController(){
         if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
             (curr >= UPPER_LIMIT && (ref - curr) > 0) || curr < LOWER_LIMIT ||  curr > UPPER_LIMIT) {
             pressBreak(); // Immediate stop
-            turnON(0);     // Blue LED: Finished
-            turnOFF(1);    // Turn off red LED
+            turnON(1);     // RED LED: indicates Dead END
+            turnOFF(0);    // Turn off Blue LED
             return;
         }
+
+        if (errIntegral > 1000) errIntegral = 1000;
+        else if (errIntegral < -1000) errIntegral = -1000;
 
 
         turnON(1); // RED for processing
