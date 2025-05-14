@@ -60,8 +60,8 @@ int main(void){
 	//ARR -> 1000 - 1
 
 	Kp = 0.8f;
-	Ki = 0.005f;
-	Kd = 0.05f;
+	Ki = 0.5f;
+	Kd = 0.6f;
 
 
 
@@ -322,7 +322,7 @@ void CAL(){
 void PIDController() {
     int count = 0;
 
-    while ((abs(ref - curr) > TOLERANCE) && (count++ < 15000)) {
+    while ((abs(ref - curr) > TOLERANCE) && (count++ < 10000)) {
 
         curr = getcurrentPosition();
         err = ref - curr;
