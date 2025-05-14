@@ -369,7 +369,8 @@ void PIDController(){
     turnOFF(1);
 }
 
-// Motor goes CLKWISE then the Indicator goes anti CLKWISE because of the gearing
+// NOTE: Due to mechanical gearing, CW on motor means CCW on indicator.
+
 
 
 
