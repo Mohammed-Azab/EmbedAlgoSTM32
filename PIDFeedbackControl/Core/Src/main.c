@@ -27,9 +27,9 @@ uint8_t FT = 1 ;
 
 
 
-uint8_t Kp;
-uint8_t Ki;
-uint8_t Kd;
+float Kp;
+float Ki;
+float Kd;
 int errDerivative = 0 ;
 int errIntegral = 0 ;
 int prevErr = 0 ;
@@ -70,7 +70,7 @@ while (1) {
 
 		 	 case 0 : break;
 
-		 	 case 1 : FT =0 ; CAL(); break;
+		 	 case 1 : freeMotor(); FT =0 ; CAL(); break;
 
 		 	 default : break;
 		 }
@@ -80,9 +80,16 @@ while (1) {
 
 	 curr = getcurrentPosition();
 
-	 PIDController();
+	 float duty =10.0f;
 
-	 delay(100);
+
+	 if (ref > LOWER_LIMIT ||  ref < UPPER_LIMIT || curr != ref){
+
+		 PIDController();
+
+	 }
+
+	 delay(50);
 
 
 	 /*
@@ -319,12 +326,13 @@ void PIDController(){
 
         // Enforce limits
         if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
-            (curr >= UPPER_LIMIT && (ref - curr) > 0)) {
+            (curr >= UPPER_LIMIT && (ref - curr) > 0) || curr < LOWER_LIMIT ||  curr > UPPER_LIMIT) {
             pressBreak(); // Immediate stop
             turnON(0);     // Blue LED: Finished
             turnOFF(1);    // Turn off red LED
             return;
         }
+
 
         turnON(1); // RED for processing
         turnOFF(0);
@@ -344,7 +352,7 @@ void PIDController(){
         freeMotor();
 
         if (u > 0) {
-            setRotationDir(1); //  clockwise
+            setRotationDir(1); //  clockwise -> counter-clockwise and vice versa
         } else {
             setRotationDir(0); // 	counter-clockwise
         }
@@ -356,6 +364,8 @@ void PIDController(){
     turnON(0); // Blue for finishing
     turnOFF(1);
 }
+
+// Motor goes CLKWISE then the Indicator goes anti CLKWISE because of the gearing
 
 
 
