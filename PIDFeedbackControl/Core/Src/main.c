@@ -57,9 +57,12 @@ int main(void){
 	initADC2();
 	initPWM();
 
-	 Kp = 1;
-	 Ki = 1.4;
-	 Kd = 1.2;
+	//ARR -> 1000 - 1
+
+	Kp = 0.05f;
+	Ki = 0.005f;
+	Kd = 0.05f;
+
 
 
 while (1) {
@@ -306,7 +309,7 @@ int getcurrentPosition(){
 
 void CAL(){
 	while (!(GPIOB -> IDR & 1 << 14) ){ // exit CAL
-		delay(50);
+		//delay(50);
 		if (getADCVal(1) != getADCVal(0)){
 			turnOFF(2);
 		}
