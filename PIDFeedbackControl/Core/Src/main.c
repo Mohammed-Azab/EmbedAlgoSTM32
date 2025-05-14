@@ -77,11 +77,7 @@ while (1) {
 
 	 ref = getADCVal(0);
 
-
 	 curr = getcurrentPosition();
-
-	 float duty =10.0f;
-
 
 	 if (ref > LOWER_LIMIT ||  ref < UPPER_LIMIT || curr != ref){
 
