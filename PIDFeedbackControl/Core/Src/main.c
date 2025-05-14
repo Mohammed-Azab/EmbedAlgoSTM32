@@ -316,7 +316,8 @@ void CAL(){
 // PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
 
 void PIDController(){
-    while (ref != curr){
+	uint8_t count = 0;
+    while ((abs(ref - curr) > TOLERANCE && count++ < 200)){
 
         curr = getcurrentPosition();
 
