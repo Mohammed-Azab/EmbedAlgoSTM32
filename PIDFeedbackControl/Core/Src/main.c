@@ -59,7 +59,7 @@ int main(void){
 
 	//ARR -> 1000 - 1
 
-	Kp = 0.05f;
+	Kp = 0.8f;
 	Ki = 0.005f;
 	Kd = 0.05f;
 
@@ -82,11 +82,8 @@ while (1) {
 
 	 curr = getcurrentPosition();
 
-	 if (ref > LOWER_LIMIT ||  ref < UPPER_LIMIT || curr != ref){
-
+	 if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref))
 		 PIDController();
-
-	 }
 
 	 delay(50);
 
@@ -322,55 +319,73 @@ void CAL(){
 
 // PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
 
-void PIDController(){
-	uint8_t count = 0;
-    while ((abs(ref - curr) > TOLERANCE && count++ < 200)){
+void PIDController() {
+    int count = 0;
+
+    while ((abs(ref - curr) > TOLERANCE) && (count++ < 15000)) {
 
         curr = getcurrentPosition();
+        err = ref - curr;
 
-        // Enforce limits
-        if ((curr <= LOWER_LIMIT && (ref - curr) < 0) ||
-            (curr >= UPPER_LIMIT && (ref - curr) > 0) || curr < LOWER_LIMIT ||  curr > UPPER_LIMIT) {
-            pressBreak(); // Immediate stop
-            turnON(1);     // RED LED: indicates Dead END
-            turnOFF(0);    // Turn off Blue LED
-            return;
+        // Enforce limits and prevent overshooting
+        if ((curr <= LOWER_LIMIT && err < 0) ||
+            (curr >= UPPER_LIMIT && err > 0) ||
+            curr < LOWER_LIMIT ||
+            curr > UPPER_LIMIT) {
+
+            pressBreak();        // Emergency stop
+            turnON(1);           // RED LED for limit hit
+            turnOFF(0);          // Turn off Blue LED
+
+            // Wait until ref is set to move AWAY from the limit
+            while (1) {
+                curr = getcurrentPosition();
+                ref = getADCVal(0);
+                err = ref - curr;
+
+                if ((curr > LOWER_LIMIT && err > 0) ||
+                    (curr < UPPER_LIMIT && err < 0)) {
+                    break; // Safe to resume
+                }
+
+                if (ref > LOWER_LIMIT && ref < UPPER_LIMIT) break;
+            }
         }
 
+
+        errIntegral += err;
         if (errIntegral > 1000) errIntegral = 1000;
         else if (errIntegral < -1000) errIntegral = -1000;
 
-
-        turnON(1); // RED for processing
-        turnOFF(0);
-
-        err = ref - curr;
-        errIntegral += err;
         errDerivative = err - prevErr;
         prevErr = err;
 
-        if (abs(err) <= TOLERANCE) break;
-
         u = Kp * err + Ki * errIntegral + Kd * errDerivative;
 
-        float duty = fabs(u);  // make sure it's positive
-        duty = duty > 100.0f?  100.0f : duty;
+        float duty = fabs(u);
+        duty = duty > 100.0f ? 100.0f : duty;  // Clamp to 100
 
-        freeMotor();
+        freeMotor();  // Remove brake
 
         if (u > 0) {
-            setRotationDir(1); //  clockwise -> counter-clockwise and vice versa
+            setRotationDir(1);  // Clockwise
         } else {
-            setRotationDir(0); // 	counter-clockwise
+            setRotationDir(0);  // Counter-clockwise
         }
 
         writePWM(duty);
+
+        // Show processing (RED ON, BLUE OFF)
+        turnON(1);
+        turnOFF(0);
     }
 
-    pressBreak(); // stop motor when done
-    turnON(0); // Blue for finishing
+    // Stop motor and show finish (BLUE ON)
+    pressBreak();
+    turnON(0);
     turnOFF(1);
 }
+
 
 // NOTE: Due to mechanical gearing, CW on motor means CCW on indicator.
 
