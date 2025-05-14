@@ -82,7 +82,7 @@ while (1) {
 
 	 PIDController();
 
-	 delay(50);
+	 delay(100);
 
 
 	 /*
