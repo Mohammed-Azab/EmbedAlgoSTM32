@@ -43,7 +43,7 @@ int u;
 
 #define LOWER_LIMIT 1050
 #define UPPER_LIMIT 3400
-#define RESET_THRESHOLD 150
+#define RESET_THRESHOLD 250
 
 
 
