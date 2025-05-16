@@ -36,12 +36,14 @@ int prevErr = 0 ;
 int err =0;
 void PIDController();
 int ref = 0 ;
+int prevRef = 0 ;
 int curr = 0;
 int u;
 
 
 #define LOWER_LIMIT 1050
 #define UPPER_LIMIT 3400
+#define RESET_THRESHOLD 150
 
 
 
@@ -61,7 +63,7 @@ int main(void){
 
 	Kp = 0.8f;
 	Ki = 0.5f;
-	Kd = 0.6f;
+	Kd = 0.8f;
 
 
 
@@ -324,6 +326,12 @@ void PIDController() {
 
     while ((abs(ref - curr) > TOLERANCE) && (count++ < 10000)) {
 
+    	if (fabs(prevRef - ref) > RESET_THRESHOLD){
+    		errDerivative =0;
+    		errIntegral = 0;
+
+    	}
+
         curr = getcurrentPosition();
         err = ref - curr;
 
@@ -384,6 +392,7 @@ void PIDController() {
     pressBreak();
     turnON(0);
     turnOFF(1);
+    prevRef = ref;
 }
 
 
