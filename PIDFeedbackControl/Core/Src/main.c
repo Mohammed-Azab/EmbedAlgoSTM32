@@ -61,7 +61,7 @@ int main(void){
 
 	//ARR -> 1000 - 1
 
-	Kp = 0.8f;
+	Kp = 5.0f;
 	Ki = 0.5f;
 	Kd = 0.8f;
 
