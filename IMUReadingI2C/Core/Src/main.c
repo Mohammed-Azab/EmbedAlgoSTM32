@@ -18,6 +18,10 @@ uint16_t getADCVal(uint8_t i);
 void initPWM();
 void writePWM (float dutyCycle);
 void initI2C();
+void controlMotor(uint8_t data);
+uint8_t readIMUData();
+
+#define STABILITY_TOLERANCE 10
 
 
 
@@ -31,9 +35,16 @@ int main(void){
 	initPWM();
 	initI2C();
 
+	uint8_t data = 0;
+
 
 
 while (1) {
+
+	freeMotor();
+	data = readIMUData();
+	controlMotor(data);
+
 
 
 
@@ -255,6 +266,25 @@ void initI2C(){
 
 	I2C2-> CR1 |= I2C_CR1_PE; //Enable I2C1
 
+
+}
+
+void controlMotor(uint8_t data){
+
+	if (data < STABILITY_TOLERANCE) {
+		pressBreak();
+		return;
+	}
+
+	uint8_t dir = data > 0? 0 : 1 ;
+	setRotationDir(dir);
+	writePWM(35); // needs to be Mapped according to the yaw roll pitch angles
+
+
+
+}
+
+uint8_t readIMUData(){
 
 }
 
