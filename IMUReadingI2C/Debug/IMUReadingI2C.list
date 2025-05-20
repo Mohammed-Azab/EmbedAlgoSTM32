@@ -79,8 +79,8 @@ Disassembly of section .text:
  8000148:	080004fc 	.word	0x080004fc
 
 0800014c <main>:
-void initPWM();
 void writePWM (float dutyCycle);
+void initI2C();
 
 
 
@@ -115,12 +115,12 @@ while (1) {
 void configureIO(){
  8000168:	b480      	push	{r7}
  800016a:	af00      	add	r7, sp, #0
-	 * HBridge ENB => B9
-	 * CAL Button => B14
+	 * SDA -> B11
+	 * SCL -> B10
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x244440A0;
+	GPIOA -> CRL = 0x444444A4;
  800016c:	4b06      	ldr	r3, [pc, #24]	@ (8000188 <configureIO+0x20>)
  800016e:	4a07      	ldr	r2, [pc, #28]	@ (800018c <configureIO+0x24>)
  8000170:	601a      	str	r2, [r3, #0]
@@ -128,7 +128,7 @@ void configureIO(){
  8000172:	4b07      	ldr	r3, [pc, #28]	@ (8000190 <configureIO+0x28>)
  8000174:	4a07      	ldr	r2, [pc, #28]	@ (8000194 <configureIO+0x2c>)
  8000176:	601a      	str	r2, [r3, #0]
-	GPIOB -> CRH = 0x48244222;
+	GPIOB -> CRH = 0x4424AA44;
  8000178:	4b05      	ldr	r3, [pc, #20]	@ (8000190 <configureIO+0x28>)
  800017a:	4a07      	ldr	r2, [pc, #28]	@ (8000198 <configureIO+0x30>)
  800017c:	605a      	str	r2, [r3, #4]
@@ -141,10 +141,10 @@ void configureIO(){
  8000184:	4770      	bx	lr
  8000186:	bf00      	nop
  8000188:	40010800 	.word	0x40010800
- 800018c:	244440a0 	.word	0x244440a0
+ 800018c:	444444a4 	.word	0x444444a4
  8000190:	40010c00 	.word	0x40010c00
  8000194:	24444444 	.word	0x24444444
- 8000198:	48244222 	.word	0x48244222
+ 8000198:	4424aa44 	.word	0x4424aa44
 
 0800019c <enableClk>:
 

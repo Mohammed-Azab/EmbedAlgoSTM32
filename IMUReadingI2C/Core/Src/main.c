@@ -17,6 +17,7 @@ void freeMotor();
 uint16_t getADCVal(uint8_t i);
 void initPWM();
 void writePWM (float dutyCycle);
+void initI2C();
 
 
 
@@ -48,20 +49,19 @@ void configureIO(){
 
 	/*
 	 *
-	 * LEDS => B10 A7 B13 output "2"
-	 * ADC => A0 input "0"
-	 * ADC => A2 input "0"
+	 * LEDS => B13 output "2"
 	 * PWM => A1 output AF "A"
 	 * HBridge IN3 => B7
 	 * HBridge IN4 => B8
 	 * HBridge ENB => B9
-	 * CAL Button => B14
+	 * SDA -> B11
+	 * SCL -> B10
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x244440A0;
+	GPIOA -> CRL = 0x444444A4;
 	GPIOB -> CRL = 0x24444444;
-	GPIOB -> CRH = 0x48244222;
+	GPIOB -> CRH = 0x4424AA44;
 
 
 }
