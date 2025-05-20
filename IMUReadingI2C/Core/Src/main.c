@@ -29,6 +29,7 @@ int main(void){
 	initADC1();
 	initADC2();
 	initPWM();
+	initI2C();
 
 
 
@@ -72,6 +73,7 @@ void enableClk(){
 	RCC -> APB1ENR |= 0b11; //enable TIM2 & TIM3
 	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 	RCC -> APB2ENR |= (1 << 9) | (1 << 10); // enable CLK for ADC1
+	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN; //enable I2C2 CLK
 }
 
 
@@ -227,6 +229,32 @@ void writePWM (float dutyCycle){
 	}
 
 	TIM2 -> CCR2 = (TIM2->ARR + 1) * dutyCycle / 100;
+
+}
+
+void initI2C(){
+
+	//enabled RCC
+	//Configured IO as AF OD
+
+	I2C2-> CR1 &= ~I2C_CR1_PE; // Disable I2C1 before configuring
+
+	// Reset I2C1 peripheral
+	I2C2-> CR1 |= I2C_CR1_SWRST;
+	I2C2-> CR1 &= ~I2C_CR1_SWRST;
+
+	I2C2 -> CR2 = 8 ; // set Freq.
+
+	I2C2-> CCR &= ~I2C_CCR_FS;  // Standard mode
+
+	//I2C1->CCR &= ~I2C_CCR_DUTY; setting duty here is useless
+
+	I2C2 -> CCR = 40;  // F/(2*speed) -> 8M / ( 2*100K )
+
+	I2C2-> TRISE = 8 + 1 ;  // TRISE = Fpclk1(MHz) + 1 => 8 + 1
+
+	I2C2-> CR1 |= I2C_CR1_PE; //Enable I2C1
+
 
 }
 
