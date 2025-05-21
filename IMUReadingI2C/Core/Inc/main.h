@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx.h"
+#include "math.h"
 
 
 /* Private includes ----------------------------------------------------------*/

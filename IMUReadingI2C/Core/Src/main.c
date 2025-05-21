@@ -35,8 +35,11 @@ int main(void){
 	initPWM();
 	initI2C();
 
-	uint8_t data = 0;
+	float roll = 0;   // X
+	float pitch = 0;  // Y
+	float yaw = 0;    // Z
 
+	int data[6];
 
 
 while (1) {
@@ -269,18 +272,17 @@ void initI2C(){
 
 }
 
-void controlMotor(uint8_t data){
+void controlMotor(float angle){
 
-	if (data < STABILITY_TOLERANCE) {
+	if (abs(angle) < STABILITY_TOLERANCE) {
 		pressBreak();
 		return;
 	}
 
 	uint8_t dir = data > 0? 0 : 1 ;
 	setRotationDir(dir);
-	writePWM(35); // needs to be Mapped according to the yaw roll pitch angles
-
-
+	float dutyCycle = ((float)angle)/18 + 2.5; // Mapping of Servo angles with angles
+	writePWM(dutyCycle);
 
 }
 
