@@ -1,13 +1,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "kalman.h"
 
-
+Kalman_t kalmanRoll, kalmanPitch;
 
 void configureIO();
 void enableClk();
-void initADC1();
-void initADC2();
 void delay(uint16_t t);
 void turnON(uint8_t i);
 void turnOFF(uint8_t i);
@@ -18,10 +17,24 @@ uint16_t getADCVal(uint8_t i);
 void initPWM();
 void writePWM (float dutyCycle);
 void initI2C();
-void controlMotor(uint8_t data);
-uint8_t readIMUData();
+void initIMU();
+void controlMotor(float data);
+void readIMUData(float* ax, float* ay, float* az,
+                 float* gx, float* gy, float* gz);
+void setAngles(float ax, float ay, float az,
+               float gx, float gy, float gz,
+               float* roll, float* pitch);
+
+
+
 
 #define STABILITY_TOLERANCE 10
+#define RAD_TO_DEG 57.2957795f
+#define MPU6050_ADDR 0x68
+#define PWR_MGMT_1   0x6B
+#define ACCEL_XOUT_H 0x3B
+#define GYRO_XOUT_H  0x43
+#define DT 0.01f  // 10ms loop time = 100Hz
 
 
 
@@ -30,8 +43,6 @@ int main(void){
 	configureIO();
 
 
-	initADC1();
-	initADC2();
 	initPWM();
 	initI2C();
 
@@ -39,25 +50,48 @@ int main(void){
 	float pitch = 0;  // Y
 	float yaw = 0;    // Z
 
-	int data[6];
+	float ax, ay, az;      // Accelerometer (g)
+	float gx, gy, gz;      // Gyroscope (°/s)
+
 
 
 while (1) {
 
 	freeMotor();
-	data = readIMUData();
-	controlMotor(data);
+	setAngles(ax,  ay,  az,
+              gx,  gy,  gz,
+              &roll, &pitch);
 
+	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
 
+	setAngles(ax, ay, az, gx, gy, gz, &roll, &pitch);
 
+	yaw += gz * DT;
+
+	if (yaw >= 360.0f) yaw -= 360.0f;
+	if (yaw < 0.0f) yaw += 360.0f;
+	if (roll >= 360.0f) roll -= 360.0f;
+	if (roll < 0.0f) roll += 360.0f;
+	if (pitch >= 360.0f) pitch -= 360.0f;
+	if (pitch < 0.0f) pitch += 360.0f;
+
+	if (fabs(roll) > STABILITY_TOLERANCE){
+		controlMotor(roll);
+	}
+	if (fabs(pitch) > STABILITY_TOLERANCE){
+		controlMotor(pitch);
+	}
+	if (fabs(yaw) > STABILITY_TOLERANCE){
+		controlMotor(yaw);
+	}
+
+	delay(10);
 
 
 }
 
 
-
 }
-
 
 
 void configureIO(){
@@ -90,55 +124,6 @@ void enableClk(){
 	RCC->APB1ENR |= RCC_APB1ENR_I2C2EN; //enable I2C2 CLK
 }
 
-
-void initADC1(){
-
-		ADC1->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
-		ADC1->SQR3 = 0; // Channel 0 first in the sequence
-		ADC1 -> SMPR2 &= 0; // reseting the sample time
-		ADC1->SMPR2 |= (0b010 << 0); // Channel 0 7.5 cycles
-
-		ADC1->CR2 |= ADC_CR2_ADON; // ADC on
-		for (volatile int i = 0; i < 10000; i++);  // Short delay
-
-		ADC1->CR2 |= ADC_CR2_CAL;          // Start calibration
-		while (ADC1->CR2 & ADC_CR2_CAL);   // Wait for calibration to finish
-
-		ADC1->CR2 |= ADC_CR2_EXTTRIG;  // Enable external trigger
-
-		ADC1->CR2 &= ~ADC_CR2_EXTSEL;       // Clear EXTSEL bits
-		ADC1->CR2 |= (0b111 << 17);         // Set EXTSEL = 111 for SWSTART
-
-		ADC1->CR2 &= ~ADC_CR2_CONT;  // Clear CONT bit for single conversion mode
-
-		ADC1->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
-
-}
-
-
-void initADC2(){
-
-		ADC2->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
-		ADC2->SQR3 = 2; // Channel 2
-		ADC2 -> SMPR2 &= 0; // reseting the sample time
-		ADC2->SMPR2 |= (0b010 << 6); // Channel 2 7.5 cycles
-
-		ADC2->CR2 |= ADC_CR2_ADON; // ADC on
-		for (volatile int i = 0; i < 10000; i++);  // Short delay
-
-		ADC2->CR2 |= ADC_CR2_CAL;          // Start calibration
-		while (ADC2->CR2 & ADC_CR2_CAL);   // Wait for calibration to finish
-
-		ADC2->CR2 |= ADC_CR2_EXTTRIG;  // Enable external trigger
-
-		ADC2->CR2 &= ~ADC_CR2_EXTSEL;       // Clear EXTSEL bits
-		ADC2->CR2 |= (0b111 << 17);         // Set EXTSEL = 111 for SWSTART
-
-		ADC2->CR2 &= ~ADC_CR2_CONT;  // Clear CONT bit for single conversion mode
-
-		ADC2->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
-
-}
 
 void turnON(uint8_t i){
 
@@ -177,24 +162,6 @@ void delay(uint16_t t){
 	TIM3 ->CR1 &= ~(TIM_CR1_CEN);
 }
 
-uint16_t getADCVal(uint8_t i){
-	if (i ==0){
-		ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
-			while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
-			ADC1->SR &= ~(ADC_SR_EOC);
-			uint16_t ADCVal = ADC1->DR;  // Read result (10-bit mask)
-			return ADCVal;
-	}
-	else {
-		ADC2->CR2 |= ADC_CR2_SWSTART; // start conversion
-		while (!(ADC2->SR & ADC_SR_EOC));     // Wait for conversion complete
-		ADC2->SR &= ~(ADC_SR_EOC);
-		uint16_t ADCVal = ADC2->DR;  // Read result (10-bit mask)
-		return ADCVal;
-	}
-
-
-}
 
 void setRotationDir(uint8_t i){
 	switch(i){
@@ -272,22 +239,106 @@ void initI2C(){
 
 }
 
-void controlMotor(float angle){
+void controlMotor(float angle) {
+    if (fabsf(angle) < STABILITY_TOLERANCE) {
+        pressBreak();
+        return;
+    }
 
-	if (abs(angle) < STABILITY_TOLERANCE) {
-		pressBreak();
-		return;
-	}
+    //uint8_t dir = (angle > 0) ? 0 : 1;
+    //setRotationDir(dir);
 
-	uint8_t dir = data > 0? 0 : 1 ;
-	setRotationDir(dir);
-	float dutyCycle = ((float)angle)/18 + 2.5; // Mapping of Servo angles with angles
-	writePWM(dutyCycle);
+    float dutyCycle = fabsf(angle) / 90.0f * 100.0f;
+    if (dutyCycle > 100.0f) dutyCycle = 100.0f;
 
+    writePWM(dutyCycle);
 }
 
-uint8_t readIMUData(){
 
+void initIMU() {
+    // Wake up the MPU6050
+    I2C2->CR1 |= I2C_CR1_START;
+    while (!(I2C2->SR1 & I2C_SR1_SB));
+    (void)I2C2->SR1;
+
+    I2C2->DR = MPU6050_ADDR << 1; // write
+    while (!(I2C2->SR1 & I2C_SR1_ADDR));
+    (void)I2C2->SR1;
+    (void)I2C2->SR2;
+
+    while (!(I2C2->SR1 & I2C_SR1_TXE));
+    I2C2->DR = PWR_MGMT_1;
+    while (!(I2C2->SR1 & I2C_SR1_TXE));
+    I2C2->DR = 0x00;
+    while (!(I2C2->SR1 & I2C_SR1_BTF));
+    I2C2->CR1 |= I2C_CR1_STOP;
 }
 
+void readIMUData(float* ax, float* ay, float* az,
+                 float* gx, float* gy, float* gz) {
+    uint8_t rawData[14];
+
+    // Start communication
+    I2C2->CR1 |= I2C_CR1_START;
+    while (!(I2C2->SR1 & I2C_SR1_SB));
+    (void)I2C2->SR1;
+
+    I2C2->DR = MPU6050_ADDR << 1; // Write
+    while (!(I2C2->SR1 & I2C_SR1_ADDR));
+    (void)I2C2->SR1; (void)I2C2->SR2;
+
+    while (!(I2C2->SR1 & I2C_SR1_TXE));
+    I2C2->DR = ACCEL_XOUT_H;
+
+    while (!(I2C2->SR1 & I2C_SR1_TXE));
+    I2C2->CR1 |= I2C_CR1_START; // Repeated start
+    while (!(I2C2->SR1 & I2C_SR1_SB));
+    (void)I2C2->SR1;
+
+    I2C2->DR = (MPU6050_ADDR << 1) | 0x01; // Read
+    while (!(I2C2->SR1 & I2C_SR1_ADDR));
+    (void)I2C2->SR1; (void)I2C2->SR2;
+
+    for (int i = 0; i < 13; i++) {
+        while (!(I2C2->SR1 & I2C_SR1_RXNE));
+        rawData[i] = I2C2->DR;
+    }
+
+    I2C2->CR1 &= ~I2C_CR1_ACK; // NACK
+    I2C2->CR1 |= I2C_CR1_STOP;
+    while (!(I2C2->SR1 & I2C_SR1_RXNE));
+    rawData[13] = I2C2->DR;
+
+    int16_t ax_raw = (rawData[0] << 8) | rawData[1];
+    int16_t ay_raw = (rawData[2] << 8) | rawData[3];
+    int16_t az_raw = (rawData[4] << 8) | rawData[5];
+    int16_t gx_raw = (rawData[8] << 8) | rawData[9];
+    int16_t gy_raw = (rawData[10] << 8) | rawData[11];
+    int16_t gz_raw = (rawData[12] << 8) | rawData[13];
+
+    // Convert raw to physical units (example: depends on sensitivity settings)
+    *ax = ax_raw / 16384.0f;  // Assuming ±2g
+    *ay = ay_raw / 16384.0f;
+    *az = az_raw / 16384.0f;
+    *gx = gx_raw / 131.0f;    // Assuming ±250°/s
+    *gy = gy_raw / 131.0f;
+    *gz = gz_raw / 131.0f;
+}
+
+
+void setAngles(float ax, float ay, float az,
+               float gx, float gy, float gz,
+               float* roll, float* pitch) {
+
+    float accel_roll  = atan2f(ay, az) * RAD_TO_DEG;
+    float accel_pitch = atan2f(-ax, sqrtf(ay * ay + az * az)) * RAD_TO_DEG;
+
+    static uint32_t lastTime = 0;
+    uint32_t now = SysTick->VAL;
+    float dt = (now - lastTime) / 8000000.0f;
+    lastTime = now;
+
+    *roll = Kalman_getAngle(&kalmanRoll, accel_roll, gx, dt);
+    *pitch = Kalman_getAngle(&kalmanPitch, accel_pitch, gy, dt);
+}
 
