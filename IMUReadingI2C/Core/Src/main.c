@@ -14,14 +14,16 @@ void setRotationDir(uint8_t i);
 void pressBreak();
 void freeMotor();
 uint16_t getADCVal(uint8_t i);
+uint16_t getcurrentPosition();
 void initPWM();
+void initADC2();
 void writePWM (float dutyCycle);
 void initI2C();
 void initIMU();
 void controlMotor(float data);
 void readIMUData(float* ax, float* ay, float* az,
                  float* gx, float* gy, float* gz);
-void setAngles(float ax, float ay, float az,
+void setVariables(float ax, float ay, float az,
                float gx, float gy, float gz,
                float* roll, float* pitch);
 
@@ -36,6 +38,34 @@ void setAngles(float ax, float ay, float az,
 #define GYRO_XOUT_H  0x43
 #define DT 0.01f  // 10ms loop time = 100Hz
 
+#define LOWER_LIMIT 1050
+#define UPPER_LIMIT 3400
+#define RESET_THRESHOLD 250
+#define TOLERANCE 35
+
+
+float Kp;
+float Ki;
+float Kd;
+int errDerivative = 0 ;
+int errIntegral = 0 ;
+int prevErr = 0 ;
+int err =0;
+void PIDController();
+int ref = 0 ;
+int prevRef = 0 ;
+int curr = 0;
+int u;
+
+
+float roll = 0;   // X
+float pitch = 0;  // Y
+float yaw = 0;    // Z
+
+float ax, ay, az;      // Accelerometer (g)
+float gx, gy, gz;      // Gyroscope (°/s)
+
+
 
 
 int main(void){
@@ -43,28 +73,26 @@ int main(void){
 	configureIO();
 
 
+	Kp = 5.0f;
+	Ki = 0.5f;
+	Kd = 0.8f;
+
+	initADC2();
 	initPWM();
 	initI2C();
+	initIMU();
 
-	float roll = 0;   // X
-	float pitch = 0;  // Y
-	float yaw = 0;    // Z
-
-	float ax, ay, az;      // Accelerometer (g)
-	float gx, gy, gz;      // Gyroscope (°/s)
 
 
 
 while (1) {
 
+
 	freeMotor();
-	setAngles(ax,  ay,  az,
-              gx,  gy,  gz,
-              &roll, &pitch);
 
 	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
 
-	setAngles(ax, ay, az, gx, gy, gz, &roll, &pitch);
+	setVariables(ax, ay, az, gx, gy, gz, &roll, &pitch);
 
 	yaw += gz * DT;
 
@@ -75,15 +103,44 @@ while (1) {
 	if (pitch >= 360.0f) pitch -= 360.0f;
 	if (pitch < 0.0f) pitch += 360.0f;
 
+	if (roll > 180.0f) roll = 180.0f;
+	if (yaw > 180.0f) yaw = 180.0f;
+	if (pitch > 180.0f) pitch = 180.0f;
+	if (roll < 0.0f) roll = 0.0f;
+	if (yaw < 0.0f) yaw = 0.0f;
+	if (pitch < 0.0f) pitch = 0.0f;
+
+	float angle_deg =0;
+
+
 	if (fabs(roll) > STABILITY_TOLERANCE){
-		controlMotor(roll);
+		    angle_deg = roll;
 	}
 	if (fabs(pitch) > STABILITY_TOLERANCE){
-		controlMotor(pitch);
+			angle_deg = pitch;
 	}
 	if (fabs(yaw) > STABILITY_TOLERANCE){
-		controlMotor(yaw);
+			angle_deg = yaw;
 	}
+	if (angle_deg ==0){
+		turnON(2);
+	}
+	else {
+		turnOFF(2);
+	}
+
+
+	// 3400 from Motor Side to 1050 to the Potentiometer Side gives angle from 0 to 180
+	// 3400 -> 0
+	// 1050 -> 180
+
+	angle_deg = 30; //Hard Coded to test
+
+	ref = (uint16_t) (-13.0556 * angle_deg + 3400);
+
+	curr = getcurrentPosition();
+
+	if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref)) PIDController();
 
 	delay(10);
 
@@ -100,6 +157,7 @@ void configureIO(){
 	 *
 	 * LEDS => B13 output "2"
 	 * PWM => A1 output AF "A"
+	 * ADC => A2 input "0"
 	 * HBridge IN3 => B7
 	 * HBridge IN4 => B8
 	 * HBridge ENB => B9
@@ -108,9 +166,9 @@ void configureIO(){
 	 *
 	 * */
 
-	GPIOA -> CRL = 0x444444A4;
+	GPIOA -> CRL = 0x444440A4;
 	GPIOB -> CRL = 0x24444444;
-	GPIOB -> CRH = 0x4424AA44;
+	GPIOB -> CRH = 0x4424AA22;
 
 
 }
@@ -152,6 +210,30 @@ void turnOFF(uint8_t i){
 }
 
 
+void initADC2(){
+
+		ADC2->SQR1 = 0x00000000;  // Reset SQR1 (sequence length = 1 by default)
+		ADC2->SQR3 = 2; // Channel 2
+		ADC2 -> SMPR2 &= 0; // reseting the sample time
+		ADC2->SMPR2 |= (0b010 << 6); // Channel 2 7.5 cycles
+
+		ADC2->CR2 |= ADC_CR2_ADON; // ADC on
+		for (volatile int i = 0; i < 10000; i++);  // Short delay
+
+		ADC2->CR2 |= ADC_CR2_CAL;          // Start calibration
+		while (ADC2->CR2 & ADC_CR2_CAL);   // Wait for calibration to finish
+
+		ADC2->CR2 |= ADC_CR2_EXTTRIG;  // Enable external trigger
+
+		ADC2->CR2 &= ~ADC_CR2_EXTSEL;       // Clear EXTSEL bits
+		ADC2->CR2 |= (0b111 << 17);         // Set EXTSEL = 111 for SWSTART
+
+		ADC2->CR2 &= ~ADC_CR2_CONT;  // Clear CONT bit for single conversion mode
+
+		ADC2->CR2 &= ~ADC_CR2_ALIGN;  // 0 = Right alignment (default)
+
+}
+
 
 void delay(uint16_t t){
 	TIM3 ->PSC = 8000-1;
@@ -160,6 +242,26 @@ void delay(uint16_t t){
 	while(!(TIM3->SR & TIM_SR_UIF));
 	TIM3->SR &= ~TIM_SR_UIF;
 	TIM3 ->CR1 &= ~(TIM_CR1_CEN);
+}
+
+
+uint16_t getADCVal(uint8_t i){
+	if (i ==0){
+		ADC1->CR2 |= ADC_CR2_SWSTART; // start conversion
+			while (!(ADC1->SR & ADC_SR_EOC));     // Wait for conversion complete
+			ADC1->SR &= ~(ADC_SR_EOC);
+			uint16_t ADCVal = ADC1->DR;  // Read result (10-bit mask)
+			return ADCVal;
+	}
+	else {
+		ADC2->CR2 |= ADC_CR2_SWSTART; // start conversion
+		while (!(ADC2->SR & ADC_SR_EOC));     // Wait for conversion complete
+		ADC2->SR &= ~(ADC_SR_EOC);
+		uint16_t ADCVal = ADC2->DR;  // Read result (10-bit mask)
+		return ADCVal;
+	}
+
+
 }
 
 
@@ -186,7 +288,7 @@ void initPWM(){
 	RCC ->APB1ENR |= RCC_APB1ENR_TIM2EN; //enable Timer
 
 	TIM2 -> PSC = 8 - 1;
-	TIM2 -> ARR = 1000 - 1;
+	TIM2 -> ARR = 20000 - 1;
 
 	TIM2->CCMR1 |= (6 << 12); // mode 1 for ch2
 
@@ -239,20 +341,15 @@ void initI2C(){
 
 }
 
-void controlMotor(float angle) {
-    if (fabsf(angle) < STABILITY_TOLERANCE) {
-        pressBreak();
-        return;
-    }
+void controlMotor(float angle_deg) {
+	    if (angle_deg < 0.0f) angle_deg = 0.0f;
+	    if (angle_deg > 180.0f) angle_deg = 180.0f;
 
-    //uint8_t dir = (angle > 0) ? 0 : 1;
-    //setRotationDir(dir);
+	    float pulse_width_us = 1000.0f + (angle_deg / 180.0f) * 1000.0f;
+	    TIM2->CCR1 = (uint16_t)pulse_width_us; // For TIM2 Channel 1
+	}
 
-    float dutyCycle = fabsf(angle) / 90.0f * 100.0f;
-    if (dutyCycle > 100.0f) dutyCycle = 100.0f;
 
-    writePWM(dutyCycle);
-}
 
 
 void initIMU() {
@@ -326,7 +423,7 @@ void readIMUData(float* ax, float* ay, float* az,
 }
 
 
-void setAngles(float ax, float ay, float az,
+void setVariables(float ax, float ay, float az,
                float gx, float gy, float gz,
                float* roll, float* pitch) {
 
@@ -341,4 +438,91 @@ void setAngles(float ax, float ay, float az,
     *roll = Kalman_getAngle(&kalmanRoll, accel_roll, gx, dt);
     *pitch = Kalman_getAngle(&kalmanPitch, accel_pitch, gy, dt);
 }
+
+uint16_t getcurrentPosition(){ return getADCVal(1);}
+
+// PID -> u(t) = Kp * E(t) + Ki * ∫E(t)dt + Kd * dE(t)/dt
+
+void PIDController() {
+    int count = 0;
+
+    while ((fabs(ref - curr) > TOLERANCE) && (count++ < 10000)) {
+
+    	if (fabs(prevRef - ref) > RESET_THRESHOLD){
+    		errDerivative =0;
+    		errIntegral = 0;
+
+    	}
+
+        curr = getcurrentPosition();
+        err = ref - curr;
+
+        // Enforce limits and prevent overshooting
+        if ((curr <= LOWER_LIMIT && err < 0) ||
+            (curr >= UPPER_LIMIT && err > 0) ||
+            curr < LOWER_LIMIT ||
+            curr > UPPER_LIMIT) {
+
+            pressBreak();        // Emergency stop
+
+            // Wait until ref is set to move AWAY from the limit
+            while (1) {
+                curr = getcurrentPosition();
+            	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
+            	setVariables(ax, ay, az, gx, gy, gz, &roll, &pitch);
+
+            	float angle_deg =0;
+            		if (fabs(roll) > STABILITY_TOLERANCE){
+            			    angle_deg = roll;
+            			}
+            			if (fabs(pitch) > STABILITY_TOLERANCE){
+            				angle_deg = pitch;
+            			}
+            			if (fabs(yaw) > STABILITY_TOLERANCE){
+            				angle_deg = yaw;
+            			}
+
+            		ref = (uint16_t) (-13.0556 * angle_deg + 3400);
+                err = ref - curr;
+
+                if ((curr > LOWER_LIMIT && err > 0) ||
+                    (curr < UPPER_LIMIT && err < 0)) {
+                    break; // Safe to resume
+                }
+
+                if (ref > LOWER_LIMIT && ref < UPPER_LIMIT) break;
+            }
+        }
+
+
+        errIntegral += err;
+        if (errIntegral > 1000) errIntegral = 1000;
+        else if (errIntegral < -1000) errIntegral = -1000;
+
+        errDerivative = err - prevErr;
+        prevErr = err;
+
+        u = Kp * err + Ki * errIntegral + Kd * errDerivative;
+
+        float duty = fabs(u);
+        duty = duty > 100.0f ? 100.0f : duty;  // Clamp to 100
+
+        freeMotor();  // Remove brake
+
+        if (u > 0) {
+            setRotationDir(1);  // Clockwise
+        } else {
+            setRotationDir(0);  // Counter-clockwise
+        }
+
+        writePWM(duty);
+
+    }
+
+    // Stop motor and show finish (BLUE ON)
+    pressBreak();
+    prevRef = ref;
+}
+
+
 
