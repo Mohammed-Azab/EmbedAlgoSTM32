@@ -32,7 +32,7 @@ void setAngles(float ax, float ay, float az,
 
 #define STABILITY_TOLERANCE 10
 #define RAD_TO_DEG 57.2957795f
-#define MPU9050_ADDR 0x68
+#define MPU9250_ADDR 0x68
 #define PWR_MGMT_1   0x6B
 #define ACCEL_XOUT_H 0x3B
 #define GYRO_XOUT_H  0x43
@@ -74,7 +74,7 @@ int main(void){
 
 
 	Kp = 5.0f;
-	Ki = 0.5f;
+	Ki = 0.7f;
 	Kd = 0.8f;
 
 	initADC2();
@@ -115,6 +115,8 @@ while (1) {
 
 	yaw += gz * DT;
 
+
+/*
 	if (yaw >= 360.0f) yaw -= 360.0f;
 	if (yaw < 0.0f) yaw += 360.0f;
 	if (roll >= 360.0f) roll -= 360.0f;
@@ -127,7 +129,7 @@ while (1) {
 	if (pitch > 180.0f) pitch = 180.0f;
 	if (roll < 0.0f) roll = 0.0f;
 	if (yaw < 0.0f) yaw = 0.0f;
-	if (pitch < 0.0f) pitch = 0.0f;
+	if (pitch < 0.0f) pitch = 0.0f; */
 
 	float angle_deg =0;
 
@@ -153,9 +155,17 @@ while (1) {
 	// 3400 -> 0
 	// 1050 -> 180
 
-	angle_deg = 30; //Hard Coded to test
+	angle_deg = 10; //Hard Coded to test
 
-	ref = (uint16_t) (-13.0556 * angle_deg + 3400);
+	angle_deg = ax < 0? -angle_deg : angle_deg ;
+
+    // -90° → 3400
+
+    //  0° → 2225
+
+    // +90° → 1050
+
+	ref = (uint16_t)(-13.0556 * angle_deg + 2225);
 
 	curr = getcurrentPosition();
 
@@ -375,7 +385,7 @@ void controlMotor(float angle_deg) {
 
 
 void initIMU() {
-    // Wake up the MPU9050
+    // Wake up the MPU9250
 	if (I2C2->SR2 & I2C_SR2_BUSY){
 		I2C2 ->CR1 &= ~I2C_CR1_PE;     // Disable I2C
 		I2C2 ->CR1 |= I2C_CR1_SWRST;   // Software reset
@@ -389,7 +399,7 @@ void initIMU() {
 
     for (volatile int i = 0 ; i<20 ; i++);
 
-    I2C2->DR = MPU9050_ADDR << 1; // write
+    I2C2->DR = MPU9250_ADDR << 1; // write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1;
     (void)I2C2->SR2;
@@ -413,7 +423,7 @@ void readIMUData(float* ax, float* ay, float* az,
 
     for (volatile int i = 0; i <20 ;i++);
 
-    I2C2->DR = MPU9050_ADDR << 1; // Write
+    I2C2->DR = MPU9250_ADDR << 1; // Write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1;
     (void)I2C2->SR2;
@@ -426,7 +436,7 @@ void readIMUData(float* ax, float* ay, float* az,
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
-    I2C2->DR = (MPU9050_ADDR << 1) | 0x01; // Read
+    I2C2->DR = (MPU9250_ADDR << 1) | 0x01; // Read
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1; (void)I2C2->SR2;
 
@@ -461,6 +471,35 @@ void setAngles(float ax, float ay, float az,
                float gx, float gy, float gz,
                float* roll, float* pitch) {
 
+    // Compute roll and pitch from accelerometer (in degrees)
+    float accel_roll  = atan2f(ay, az) * RAD_TO_DEG;
+    float accel_pitch = atan2f(-ax, sqrtf(ay * ay + az * az)) * RAD_TO_DEG;
+
+    // Calculate delta time in seconds
+    static uint32_t lastTime = 0;
+    uint32_t now = SysTick->VAL;
+    float dt = (now - lastTime) / 8000000.0f;  // Assuming 8 MHz SysTick clock
+    lastTime = now;
+
+    // Complementary filter constant
+    const float alpha = 0.98f;
+
+    // Integrate gyro data
+    static float roll_cf = 0.0f;
+    static float pitch_cf = 0.0f;
+
+    roll_cf  = alpha * (roll_cf + gx * dt)  + (1 - alpha) * accel_roll;
+    pitch_cf = alpha * (pitch_cf + gy * dt) + (1 - alpha) * accel_pitch;
+
+    *roll = roll_cf;
+    *pitch = pitch_cf;
+}
+
+/*
+ * void setAngles(float ax, float ay, float az,
+               float gx, float gy, float gz,
+               float* roll, float* pitch) {
+
     float accel_roll  = atan2f(ay, az) * RAD_TO_DEG;
     float accel_pitch = atan2f(-ax, sqrtf(ay * ay + az * az)) * RAD_TO_DEG;
 
@@ -472,6 +511,7 @@ void setAngles(float ax, float ay, float az,
     *roll = Kalman_getAngle(&kalmanRoll, accel_roll, gx, dt);
     *pitch = Kalman_getAngle(&kalmanPitch, accel_pitch, gy, dt);
 }
+ */
 
 uint16_t getcurrentPosition(){ return getADCVal(1);}
 
