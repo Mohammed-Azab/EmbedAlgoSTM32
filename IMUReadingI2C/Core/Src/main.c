@@ -23,7 +23,7 @@ void initIMU();
 void controlMotor(float data);
 void readIMUData(float* ax, float* ay, float* az,
                  float* gx, float* gy, float* gz);
-void setVariables(float ax, float ay, float az,
+void setAngles(float ax, float ay, float az,
                float gx, float gy, float gz,
                float* roll, float* pitch);
 
@@ -32,7 +32,7 @@ void setVariables(float ax, float ay, float az,
 
 #define STABILITY_TOLERANCE 10
 #define RAD_TO_DEG 57.2957795f
-#define MPU6050_ADDR 0x68
+#define MPU9050_ADDR 0x68
 #define PWR_MGMT_1   0x6B
 #define ACCEL_XOUT_H 0x3B
 #define GYRO_XOUT_H  0x43
@@ -92,7 +92,26 @@ while (1) {
 
 	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
 
-	setVariables(ax, ay, az, gx, gy, gz, &roll, &pitch);
+	if (gx !=0){
+			turnON(2);
+		}
+		else {
+			turnOFF(2);
+		}
+	if (gy !=0){
+				turnON(2);
+			}
+			else {
+				turnOFF(2);
+			}
+	if (gz !=0){
+					turnON(2);
+				}
+				else {
+					turnOFF(2);
+				}
+
+	setAngles(ax, ay, az, gx, gy, gz, &roll, &pitch);
 
 	yaw += gz * DT;
 
@@ -122,7 +141,7 @@ while (1) {
 	if (fabs(yaw) > STABILITY_TOLERANCE){
 			angle_deg = yaw;
 	}
-	if (angle_deg ==0){
+	if (angle_deg >15){
 		turnON(2);
 	}
 	else {
@@ -140,7 +159,7 @@ while (1) {
 
 	curr = getcurrentPosition();
 
-	if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref)) PIDController();
+	//if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref)) PIDController();
 
 	delay(10);
 
@@ -358,7 +377,7 @@ void initIMU() {
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
-    I2C2->DR = MPU6050_ADDR << 1; // write
+    I2C2->DR = MPU9050_ADDR << 1; // write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1;
     (void)I2C2->SR2;
@@ -375,12 +394,15 @@ void readIMUData(float* ax, float* ay, float* az,
                  float* gx, float* gy, float* gz) {
     uint8_t rawData[14];
 
+    while (!(I2C2->SR1 & (1 << 1))); // check if it's not busy
     // Start communication
     I2C2->CR1 |= I2C_CR1_START;
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
-    I2C2->DR = MPU6050_ADDR << 1; // Write
+    for (volatile int i = 0; i <10000 ;i++);
+
+    I2C2->DR = MPU9050_ADDR << 1; // Write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1; (void)I2C2->SR2;
 
@@ -392,7 +414,7 @@ void readIMUData(float* ax, float* ay, float* az,
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
-    I2C2->DR = (MPU6050_ADDR << 1) | 0x01; // Read
+    I2C2->DR = (MPU9050_ADDR << 1) | 0x01; // Read
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1; (void)I2C2->SR2;
 
@@ -423,7 +445,7 @@ void readIMUData(float* ax, float* ay, float* az,
 }
 
 
-void setVariables(float ax, float ay, float az,
+void setAngles(float ax, float ay, float az,
                float gx, float gy, float gz,
                float* roll, float* pitch) {
 
@@ -469,7 +491,7 @@ void PIDController() {
             while (1) {
                 curr = getcurrentPosition();
             	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
-            	setVariables(ax, ay, az, gx, gy, gz, &roll, &pitch);
+            	setAngles(ax, ay, az, gx, gy, gz, &roll, &pitch);
 
             	float angle_deg =0;
             		if (fabs(roll) > STABILITY_TOLERANCE){
