@@ -92,24 +92,24 @@ while (1) {
 
 	readIMUData(&ax, &ay, &az, &gx, &gy, &gz);
 
-	if (gx !=0){
-			turnON(2);
-		}
-		else {
-			turnOFF(2);
-		}
-	if (gy !=0){
-				turnON(2);
-			}
-			else {
-				turnOFF(2);
-			}
-	if (gz !=0){
-					turnON(2);
-				}
-				else {
-					turnOFF(2);
-				}
+//	if (gx !=0){
+//			turnON(2);
+//		}
+//		else {
+//			turnOFF(2);
+//		}
+//	if (gy !=0){
+//				turnON(2);
+//			}
+//			else {
+//				turnOFF(2);
+//			}
+//	if (gz !=0){
+//					turnON(2);
+//				}
+//				else {
+//					turnOFF(2);
+//				}
 
 	setAngles(ax, ay, az, gx, gy, gz, &roll, &pitch);
 
@@ -131,19 +131,10 @@ while (1) {
 	if (yaw < 0.0f) yaw = 0.0f;
 	if (pitch < 0.0f) pitch = 0.0f; */
 
-	float angle_deg =0;
+	float angle_deg = roll;
 
 
-	if (fabs(roll) > STABILITY_TOLERANCE){
-		    angle_deg = roll;
-	}
-	if (fabs(pitch) > STABILITY_TOLERANCE){
-			angle_deg = pitch;
-	}
-	if (fabs(yaw) > STABILITY_TOLERANCE){
-			angle_deg = yaw;
-	}
-	if (angle_deg >15){
+	if (angle_deg !=0){
 		turnON(2);
 	}
 	else {
@@ -155,9 +146,9 @@ while (1) {
 	// 3400 -> 0
 	// 1050 -> 180
 
-	angle_deg = 10; //Hard Coded to test
+	//angle_deg = 10; //Hard Coded to test
 
-	angle_deg = ax < 0? -angle_deg : angle_deg ;
+	//angle_deg = ax < 0? -angle_deg : angle_deg ;
 
     // -90° → 3400
 
@@ -436,19 +427,27 @@ void readIMUData(float* ax, float* ay, float* az,
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
+    I2C2->CR1 |= I2C_CR1_ACK; // Enable ACK before reading
+
     I2C2->DR = (MPU9250_ADDR << 1) | 0x01; // Read
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
     (void)I2C2->SR1; (void)I2C2->SR2;
 
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 14; i++) {
         while (!(I2C2->SR1 & I2C_SR1_RXNE));
+
+        if (i == 12) {
+            I2C2->CR1 &= ~I2C_CR1_ACK;  // NACK before 2nd last byte
+            I2C2->CR1 |= I2C_CR1_STOP;  // Generate STOP
+        }
+
         rawData[i] = I2C2->DR;
     }
 
-    I2C2->CR1 &= ~I2C_CR1_ACK; // NACK
-    I2C2->CR1 |= I2C_CR1_STOP;
-    while (!(I2C2->SR1 & I2C_SR1_RXNE));
-    rawData[13] = I2C2->DR;
+//    I2C2->CR1 &= ~I2C_CR1_ACK; // NACK
+//    I2C2->CR1 |= I2C_CR1_STOP;
+//    while (!(I2C2->SR1 & I2C_SR1_RXNE));
+//    rawData[13] = I2C2->DR;
 
     int16_t ax_raw = (rawData[0] << 8) | rawData[1];
     int16_t ay_raw = (rawData[2] << 8) | rawData[3];
