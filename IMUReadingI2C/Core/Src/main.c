@@ -159,7 +159,7 @@ while (1) {
 
 	curr = getcurrentPosition();
 
-	//if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref)) PIDController();
+	if ((ref >= LOWER_LIMIT && ref <= UPPER_LIMIT) && (curr != ref)) PIDController();
 
 	delay(10);
 
@@ -339,23 +339,26 @@ void initI2C(){
 	//enabled RCC
 	//Configured IO as AF OD
 
-	I2C2-> CR1 &= ~I2C_CR1_PE; // Disable I2C1 before configuring
+	I2C2-> CR1 &= ~I2C_CR1_PE; // Disable I2C2 before configuring
 
-	// Reset I2C1 peripheral
+	// Reset I2C2 peripheral
 	I2C2-> CR1 |= I2C_CR1_SWRST;
 	I2C2-> CR1 &= ~I2C_CR1_SWRST;
 
 	I2C2 -> CR2 = 8 ; // set Freq.
 
 	I2C2-> CCR &= ~I2C_CCR_FS;  // Standard mode
+	I2C2 -> CCR |= (1<<15); //or
 
-	//I2C1->CCR &= ~I2C_CCR_DUTY; setting duty here is useless
+	//I2C2->CCR &= ~I2C_CCR_DUTY; setting duty here is useless
 
-	I2C2 -> CCR = 40;  // F/(2*speed) -> 8M / ( 2*100K )
+	I2C2->CCR = 7;
+
+	// F/(2*speed) -> 8M / ( 2*100K )
 
 	I2C2-> TRISE = 8 + 1 ;  // TRISE = Fpclk1(MHz) + 1 => 8 + 1
 
-	I2C2-> CR1 |= I2C_CR1_PE; //Enable I2C1
+	I2C2-> CR1 |= I2C_CR1_PE; //Enable I2C2
 
 
 }
@@ -372,10 +375,19 @@ void controlMotor(float angle_deg) {
 
 
 void initIMU() {
-    // Wake up the MPU6050
+    // Wake up the MPU9050
+	if (I2C2->SR2 & I2C_SR2_BUSY){
+		I2C2 ->CR1 &= ~I2C_CR1_PE;     // Disable I2C
+		I2C2 ->CR1 |= I2C_CR1_SWRST;   // Software reset
+		I2C2 ->CR1 &= ~I2C_CR1_SWRST;
+		I2C2 ->CR1 |= I2C_CR1_PE;      // Re-enable I2C
+	}
+
     I2C2->CR1 |= I2C_CR1_START;
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
+
+    for (volatile int i = 0 ; i<20 ; i++);
 
     I2C2->DR = MPU9050_ADDR << 1; // write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
@@ -384,7 +396,7 @@ void initIMU() {
 
     while (!(I2C2->SR1 & I2C_SR1_TXE));
     I2C2->DR = PWR_MGMT_1;
-    while (!(I2C2->SR1 & I2C_SR1_TXE));
+    while (!(I2C2->SR1 & I2C_SR1_BTF));
     I2C2->DR = 0x00;
     while (!(I2C2->SR1 & I2C_SR1_BTF));
     I2C2->CR1 |= I2C_CR1_STOP;
@@ -394,17 +406,17 @@ void readIMUData(float* ax, float* ay, float* az,
                  float* gx, float* gy, float* gz) {
     uint8_t rawData[14];
 
-    while (!(I2C2->SR1 & (1 << 1))); // check if it's not busy
     // Start communication
     I2C2->CR1 |= I2C_CR1_START;
     while (!(I2C2->SR1 & I2C_SR1_SB));
     (void)I2C2->SR1;
 
-    for (volatile int i = 0; i <10000 ;i++);
+    for (volatile int i = 0; i <20 ;i++);
 
     I2C2->DR = MPU9050_ADDR << 1; // Write
     while (!(I2C2->SR1 & I2C_SR1_ADDR));
-    (void)I2C2->SR1; (void)I2C2->SR2;
+    (void)I2C2->SR1;
+    (void)I2C2->SR2;
 
     while (!(I2C2->SR1 & I2C_SR1_TXE));
     I2C2->DR = ACCEL_XOUT_H;

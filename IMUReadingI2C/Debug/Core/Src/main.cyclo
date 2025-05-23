@@ -1,4 +1,4 @@
-../Core/Src/main.c:71:5:main	20
+../Core/Src/main.c:71:5:main	23
 ../Core/Src/main.c:173:6:configureIO	1
 ../Core/Src/main.c:195:6:enableClk	1
 ../Core/Src/main.c:205:6:turnON	5
@@ -12,9 +12,9 @@
 ../Core/Src/main.c:306:6:initPWM	1
 ../Core/Src/main.c:328:6:writePWM	2
 ../Core/Src/main.c:337:6:initI2C	1
-../Core/Src/main.c:363:6:controlMotor	3
-../Core/Src/main.c:374:6:initIMU	6
-../Core/Src/main.c:393:6:readIMUData	12
-../Core/Src/main.c:448:6:setAngles	1
-../Core/Src/main.c:464:10:getcurrentPosition	1
-../Core/Src/main.c:468:6:PIDController	23
+../Core/Src/main.c:366:6:controlMotor	3
+../Core/Src/main.c:377:6:initIMU	8
+../Core/Src/main.c:405:6:readIMUData	11
+../Core/Src/main.c:460:6:setAngles	1
+../Core/Src/main.c:476:10:getcurrentPosition	1
+../Core/Src/main.c:480:6:PIDController	23
