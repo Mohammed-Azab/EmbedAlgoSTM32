@@ -18,8 +18,9 @@ void TaskBlinkLED2(void *arg);
 
 int main(){
 
-	RCC ->APB2ENR |= RCC_APB2ENR_IOPBEN;
+	RCC ->APB2ENR |= RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPAEN;
 	GPIOB -> CRH = 0x44442244;
+	GPIOA -> CRL = 0x24444444; //using A7 as GND
 
 	xTaskCreate(TaskBlinkLED1,"T1",128,NULL, 1 , NULL);
 	xTaskCreate(TaskBlinkLED2,"T2",128,NULL, 1 , NULL);
